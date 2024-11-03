@@ -1,4 +1,6 @@
-﻿namespace Warehouse.Core.DTO;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Warehouse.Core.DTO;
 
 public class Area : BaseEntity
 {
@@ -7,7 +9,7 @@ public class Area : BaseEntity
     public DateTime CreateTime { get; set; }
 
     public DateTime? DeleteTime { get; set; }
-
+    
     public virtual Cargo Cargo { get; set; } = null!;
 
     public virtual Warehouse Warehouse { get; set; } = null!;

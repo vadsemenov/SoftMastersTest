@@ -1,16 +1,14 @@
-﻿using Microsoft.VisualBasic;
-using Warehouse.Core.DTO;
-using Warehouse.DataAccess;
+﻿using Warehouse.Core.DTO;
 using Warehouse.DataAccess.Repositories.Interfaces;
 using Warehouse.DataAccess.UOW;
 using Warehouse.Utils;
 using StringComparer = Warehouse.Utils.StringComparer;
 
-namespace Warehouse.ConsoleApp;
+namespace Warehouse.DataAccess.Utils;
 
 public static class DatabaseService
 {
-    public static void CreateAndFillWarehouseDatabaseWithUow(this UnitOfWork unitOfWork)
+    public static async Task CreateAndFillWarehouseDatabaseWithUowAsync(this UnitOfWork unitOfWork)
     {
         var warehouseRepository = unitOfWork.GetRepository<IWarehouseRepository>();
         var picketRepository = unitOfWork.GetRepository<IPicketRepository>();
@@ -19,7 +17,7 @@ public static class DatabaseService
 
         try
         {
-            unitOfWork.BeginTransaction();
+            await unitOfWork.BeginTransactionAsync();
 
             var warehouse = new Core.DTO.Warehouse
             {
@@ -52,7 +50,7 @@ public static class DatabaseService
                 Warehouse = warehouse
             };
 
-            picketRepository.Create(new List<Picket>{picket1, picket2, picket3, picket4});
+            picketRepository.Create(new List<Picket> { picket1, picket2, picket3, picket4 });
 
             var cargo1 = new Cargo
             {
@@ -72,7 +70,7 @@ public static class DatabaseService
                 Weight = 4000
             };
 
-            cargoRepository.Create(new List<Cargo>{cargo1, cargo2});
+            cargoRepository.Create(new List<Cargo> { cargo1, cargo2 });
 
             var area1Pickets = new List<Picket>
             {
@@ -122,15 +120,15 @@ public static class DatabaseService
                 CreateTime = new DateTime(new DateOnly(2024, 10, 31), TimeOnly.Parse("15:00:00"))
             };
 
-            areaRepository.Create(new List<Area>{area1, area2, area3});
+            areaRepository.Create(new List<Area> { area1, area2, area3 });
 
-            unitOfWork.CommitTransaction();
+            await unitOfWork.CommitTransactionAsync();
 
-            unitOfWork.Save();
+            await unitOfWork.SaveAsync();
         }
         catch
         {
-            unitOfWork.RollbackTransaction();
+            await unitOfWork.RollbackTransactionAsync();
         }
     }
 

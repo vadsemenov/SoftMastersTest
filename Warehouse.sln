@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.DataAccess", "War
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.ConsoleApp", "Warehouse.Console\Warehouse.ConsoleApp.csproj", "{7ADBDAE6-2068-485E-A6FE-16D4AE415292}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Core", "Warehouse.Core\Warehouse.Core.csproj", "{FCE5E101-540A-47DC-A06D-E6C247C2506D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Core", "Warehouse.Core\Warehouse.Core.csproj", "{FCE5E101-540A-47DC-A06D-E6C247C2506D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Utils", "Warehouse.Utils\Warehouse.Utils.csproj", "{EF969BBE-F8AA-4337-AF9E-A3BB2F5AA037}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Utils", "Warehouse.Utils\Warehouse.Utils.csproj", "{EF969BBE-F8AA-4337-AF9E-A3BB2F5AA037}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.WebApi", "Warehouse.WebApi\Warehouse.WebApi.csproj", "{54AB2C53-BFA0-4E39-9F0F-8BDDBA1E8E88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{EF969BBE-F8AA-4337-AF9E-A3BB2F5AA037}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF969BBE-F8AA-4337-AF9E-A3BB2F5AA037}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF969BBE-F8AA-4337-AF9E-A3BB2F5AA037}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54AB2C53-BFA0-4E39-9F0F-8BDDBA1E8E88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54AB2C53-BFA0-4E39-9F0F-8BDDBA1E8E88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54AB2C53-BFA0-4E39-9F0F-8BDDBA1E8E88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54AB2C53-BFA0-4E39-9F0F-8BDDBA1E8E88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

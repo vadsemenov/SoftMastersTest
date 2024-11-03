@@ -339,3 +339,7 @@ ASALocalRun/
 .localhistory/
 
 .vscode/
+
+*.db
+*.db-shm
+*.db-wal

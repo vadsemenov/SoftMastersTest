@@ -1,6 +1,7 @@
 ﻿using Warehouse.DataAccess;
 using Warehouse.DataAccess.Repositories.Interfaces;
 using Warehouse.DataAccess.UOW;
+using Warehouse.DataAccess.Utils;
 
 namespace Warehouse.ConsoleApp;
 
@@ -15,9 +16,9 @@ public class Program
 
         var unitOfWork = new UnitOfWork(context);
 
-        unitOfWork.CreateAndFillWarehouseDatabaseWithUow();
+        unitOfWork.CreateAndFillWarehouseDatabaseWithUowAsync().GetAwaiter().GetResult();
 
-        var areas = unitOfWork.GetRepository<IAreaRepository>().GetAll();
+        var areas = unitOfWork.GetRepository<IAreaRepository>().GetAllAsync().GetAwaiter().GetResult();
 
         Console.Read();
     }

@@ -10,7 +10,9 @@ public interface IMainRepository<T> : IRepository where T : class
 
     void Delete(T entity);
 
-    T[] GetAll();
+    Task<ICollection<T>> GetAllAsync();
 
-    T GetById(int id);
+    Task<T?> GetByIdAsync(int id);
+
+    Task SaveAsync();
 }

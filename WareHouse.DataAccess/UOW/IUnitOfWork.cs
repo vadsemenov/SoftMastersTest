@@ -4,7 +4,13 @@ namespace Warehouse.DataAccess.UOW;
 
 public interface IUnitOfWork : IDisposable
 {
-    void Save();
+    Task BeginTransactionAsync();
+
+    Task CommitTransactionAsync();
+
+    Task RollbackTransactionAsync();
+
+    Task SaveAsync();
 
     T GetRepository<T>() where T : class, IRepository;
 }

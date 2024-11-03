@@ -16,7 +16,7 @@ public abstract class BaseEfRepository<T> : IMainRepository<T> where T : class
         DbSet = dbContext.Set<T>();
     }
 
-    public virtual void Save() => DbContext.SaveChanges();
+    public virtual async Task SaveAsync() => await DbContext.SaveChangesAsync();
 
     public virtual void Create(T entity)
     {
@@ -44,7 +44,7 @@ public abstract class BaseEfRepository<T> : IMainRepository<T> where T : class
         DbSet.Remove(entity);
     }
 
-    public virtual T[] GetAll() => DbSet.ToArray();
+    public virtual async Task<ICollection<T>> GetAllAsync() => await DbSet.ToListAsync();
 
-    public virtual T GetById(int id) => DbSet.Find(id)!;
+    public virtual async Task<T?> GetByIdAsync(int id) => await DbSet.FindAsync(id);
 }

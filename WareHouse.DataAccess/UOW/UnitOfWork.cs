@@ -11,9 +11,14 @@ public class UnitOfWork : IUnitOfWork
 
     private IDbContextTransaction? _transaction;
 
+    private IAreaRepository _areaRepository = null!;
+    private ICargoRepository _cargoRepository = null!;
+    private IPicketRepository _picketRepository = null!;
+    private IWarehouseRepository _warehouseRepository = null!;
+
     private bool _disposed;
 
-    public UnitOfWork(DbContext dbContext)
+    public UnitOfWork(WarehouseDbContext dbContext)
     {
         _dbContext = dbContext ?? throw new Exception("DbContext is null!");
     }
@@ -27,28 +32,36 @@ public class UnitOfWork : IUnitOfWork
 
         if (typeof(T) == typeof(IAreaRepository))
         {
-            return (new AreaRepository(_dbContext) as T)!;
+            _areaRepository ??= new AreaRepository(_dbContext);
+
+            return (_areaRepository as T)!;
         }
 
         if (typeof(T) == typeof(ICargoRepository))
         {
-            return (new CargoRepository(_dbContext) as T)!;
+            _cargoRepository ??= new CargoRepository(_dbContext);
+
+            return (_cargoRepository as T)!;
         }
 
         if (typeof(T) == typeof(IPicketRepository))
         {
-            return (new PicketRepository(_dbContext) as T)!;
+            _picketRepository ??= new PicketRepository(_dbContext);
+
+            return (_picketRepository as T)!;
         }
 
         if (typeof(T) == typeof(IWarehouseRepository))
         {
-            return (new WarehouseRepository(_dbContext) as T)!;
+            _warehouseRepository ??= new WarehouseRepository(_dbContext);
+
+            return (_warehouseRepository as T)!;
         }
 
         throw new Exception($"Repository {typeof(T)} does not exist!");
     }
 
-    public void BeginTransaction()
+    public async Task BeginTransactionAsync()
     {
         if (_disposed)
         {
@@ -60,10 +73,10 @@ public class UnitOfWork : IUnitOfWork
             throw new Exception("There is already an existing transaction!");
         }
 
-        _transaction = _dbContext.Database.BeginTransaction();
+        _transaction = await _dbContext.Database.BeginTransactionAsync();
     }
 
-    public void CommitTransaction()
+    public async Task CommitTransactionAsync()
     {
         if (_disposed)
         {
@@ -75,12 +88,12 @@ public class UnitOfWork : IUnitOfWork
             return;
         }
 
-        _transaction.Commit();
+        await _transaction.CommitAsync();
 
         _transaction = null;
     }
 
-    public void RollbackTransaction()
+    public async Task RollbackTransactionAsync()
     {
         if (_disposed)
         {
@@ -92,19 +105,19 @@ public class UnitOfWork : IUnitOfWork
             return;
         }
 
-        _transaction.Rollback();
+        await _transaction.RollbackAsync();
 
         _transaction = null;
     }
 
-    public void Save()
+    public async Task SaveAsync()
     {
         if (_disposed)
         {
             throw new MemberAccessException("UnitOfWork is already disposed!");
         }
 
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
     }
 
     public void Dispose()
