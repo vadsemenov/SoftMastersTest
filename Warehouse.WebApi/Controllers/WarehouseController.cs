@@ -46,7 +46,7 @@ namespace Warehouse.WebApi.Controllers
             return Ok(warehousesResponse);
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<WarehouseResponse>> GetWarehouseByIdAsync(int id)
         { 
             WarehouseResponse? warehouse;
