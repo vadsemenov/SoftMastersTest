@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Warehouse.Core.DTO;
+﻿namespace Warehouse.Core.DTO;
 
 public class Area : BaseEntity
 {

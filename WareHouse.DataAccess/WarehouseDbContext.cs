@@ -13,6 +13,10 @@ public class WarehouseDbContext : DbContext
 
     public virtual DbSet<Core.DTO.Warehouse> Warehouses { get; set; } = null!;
 
+    public WarehouseDbContext()
+    {
+    }
+
     public WarehouseDbContext(DbContextOptions<WarehouseDbContext> options):base(options)
     {
     }

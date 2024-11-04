@@ -1,0 +1,52 @@
+﻿@page "/"
+@using Warehouse.Ui.Model
+@inject HttpClient Client
+<div align="center">
+    <h3>Склады</h3>
+    <br /><br />
+
+    @if (_warehouses == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        @foreach (var warehouse in _warehouses)
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Номер склада</th>
+                        <th>Номер площадки</th>
+                        <th>Номер пикета</th>
+                        <th>Груз на площадке(т)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var area in warehouse.Areas)
+                    {
+                        @foreach (var picket in area.Pickets)
+                        {
+                            <tr>
+                                <td>@warehouse.Name</td>
+                                <td>@area.Name</td>
+                                <td>@picket.Name</td>
+                                <td>@area.Cargo.Weight</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+    }
+</div>
+
+@code {
+
+   private List<WarehouseResponse>? _warehouses;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _warehouses = await Client.GetFromJsonAsync<List<WarehouseResponse>>("Warehouse");
+    }
+}

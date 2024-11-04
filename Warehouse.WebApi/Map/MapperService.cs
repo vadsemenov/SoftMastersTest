@@ -4,9 +4,8 @@ using Warehouse.WebApi.Model;
 
 namespace Warehouse.WebApi.Map;
 
-public static class Mapper
+public static class MapperService
 {
-
     public static WarehouseResponse ToModel(this Core.DTO.Warehouse warehouseDto)
     {
         return new WarehouseResponse

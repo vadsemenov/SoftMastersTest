@@ -19,8 +19,4 @@
     <ProjectReference Include="..\Warehouse.DataAccess\Warehouse.DataAccess.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Map\" />
-  </ItemGroup>
-
 </Project>

@@ -55,7 +55,7 @@ public static class DatabaseService
             var cargo1 = new Cargo
             {
                 LoadTime = new DateTime(new DateOnly(2024, 10, 31), TimeOnly.Parse("10:00:00")),
-                Weight = 5002
+                Weight = 5002.003M
             };
 
             var cargo2 = new Cargo

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Warehouse.DataAccess;
 using Warehouse.DataAccess.UOW;
@@ -6,12 +7,21 @@ using Warehouse.DataAccess.Utils;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddCors(policy =>
+{
+    policy.AddPolicy("CorsPolicy", opt => opt
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
+
 // https://github.com/dotnet/efcore/issues/15218
 builder.Services.AddDbContext<WarehouseDbContext>(options =>
 {
     options
         .UseLazyLoadingProxies()
-        .UseSqlite("Data Source=warehouse.db");
+        .UseSqlite(builder.Configuration.GetConnectionString("SqLite"));
 });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(options =>
@@ -29,6 +39,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(options =>
 });
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -47,5 +58,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("CorsPolicy");
+// app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().AllowCredentials());
 
 app.Run();
