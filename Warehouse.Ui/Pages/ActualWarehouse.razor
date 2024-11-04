@@ -4,6 +4,10 @@
 <div align="center">
     <h3>Склады</h3>
     <br /><br />
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+        <RadzenLabel Text="Select Date" Component="RadzenDatePickerBindValue" />
+        <RadzenDatePicker @bind-Value=@newDateTime Name="RadzenDatePickerBindValue" ShowCalendarWeek />
+    </RadzenStack>
 
     @if (_warehouses == null)
     {
@@ -49,4 +53,6 @@
     {
         _warehouses = await Client.GetFromJsonAsync<List<WarehouseResponse>>("Warehouse");
     }
+
+    DateTime? newDateTime;
 }
