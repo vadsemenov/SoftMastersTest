@@ -46,9 +46,33 @@ namespace Warehouse.WebApi.Controllers
             return Ok(warehousesResponse);
         }
 
+        [HttpGet("{dateTime:DateTime}")]
+        public async Task<ActionResult<ICollection<WarehouseResponse>>> GetAllWarehousesAsync(DateTime dateTime)
+        {
+            ICollection<Core.DTO.Warehouse> warehouses = new List<Core.DTO.Warehouse>();
+            ICollection<WarehouseResponse> warehousesResponse = new List<WarehouseResponse>();
+
+            try
+            {
+                var repository = _unitOfWork.GetRepository<IWarehouseRepository>();
+
+                warehouses = await repository.GetAllAsync();
+
+                warehousesResponse = warehouses.Select(w => w.ToModel()).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+
+                return BadRequest();
+            }
+
+            return Ok(warehousesResponse);
+        }
+
         [HttpGet("{id:int}")]
         public async Task<ActionResult<WarehouseResponse>> GetWarehouseByIdAsync(int id)
-        { 
+        {
             WarehouseResponse? warehouse;
             try
             {

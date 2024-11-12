@@ -8,9 +8,9 @@ public class AreaResponse
 
     public string Name { get; set; } = null!;
 
-    public string CreateTime { get; set; } = string.Empty;
+    public DateTime CreateTime { get; set; } 
 
-    public string DeleteTime { get; set; } = string.Empty;
+    public DateTime DeleteTime { get; set; } 
 
     public CargoResponse Cargo { get; set; } = null!;
 

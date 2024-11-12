@@ -1,6 +1,8 @@
 ﻿@page "/"
 @using Warehouse.Ui.Model
-@inject HttpClient Client
+@using Warehouse.Ui.Services
+@inject HttpService HttpService
+@* @inject HttpClient Client *@
 @inject NotificationService NotificationService
 
 <div align="center" class="container pb-5">
@@ -57,7 +59,7 @@
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(AreaResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
                     <RadzenDataGridColumn Property="@nameof(AreaResponse.Name)" Title="Имя площадки" Frozen="true" Width="160px" />
-                    <RadzenDataGridColumn Property="@nameof(AreaResponse.CreateTime)" FormatString="{0:d}" Title="Дата создания" Frozen="true" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(AreaResponse.CreateTime)" FormatString="{0:MM/dd/yy H:mm:ss}" Title="Дата и время создания" Frozen="true" Width="160px" />
                     @* {0:hh\\:mm\\:ss} *@
                 </Columns>
             </RadzenDataGrid>
@@ -77,6 +79,7 @@
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(CargoResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
                     <RadzenDataGridColumn Property="@nameof(CargoResponse.Weight)" Title="Вес груза" Frozen="true" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(CargoResponse.LoadTime)" Title="Дата погрузки" FormatString="{0:MM/dd/yy H:mm:ss}" Frozen="true" Width="160px" />
                 </Columns>
             </RadzenDataGrid>
             <RadzenStack class="py-2" Gap="1rem" AlignItems="AlignItems.Center">
@@ -134,41 +137,50 @@
     private IList<AreaResponse>? _selectedAreas;
     private IList<CargoResponse>? _selectedCargoes;
 
+    private const string AddWarehouseTitle = "Добавление склада";
+    private const string AddPicketTitle = "Добавление пикета";
+    private const string AddAreaTitle = "Добавление площадки";
+    private const string DeleteAreaTitle = "Удаление площадки";
+    private const string CreateCargoTitle = "Добавление груза";
+    private const string DeleteCargoTitle = "Удаление груза";
+
     private DateTime? _newDateTime = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
-        _warehouses = await Client.GetFromJsonAsync<List<WarehouseResponse>>("Warehouse");
+        _warehouses = await HttpService.GetWarehouses();
     }
 
     private void OnAddWarehouse()
     {
-        SendNotificationMessage("Добавление склада", "Склад добавлен");
+       var time = HttpService.GetWarehousesByTime(DateTime.Now);
+
+        SendNotificationMessage(AddWarehouseTitle, "Склад добавлен");
     }
 
     private void OnAddPicket()
     {
-        SendNotificationMessage("Добавление пикета", "Пикет добавлен");
+        SendNotificationMessage(AddPicketTitle, "Пикет добавлен");
     }
 
     private void OnAddArea()
     {
-        SendNotificationMessage("Добавление площадки", "Площадка добавлена");
+        SendNotificationMessage(AddAreaTitle, "Площадка добавлена");
     }
 
     private void OnDeleteArea()
     {
-        SendNotificationMessage("Удаление площадки", "Площадка удалена");
+        SendNotificationMessage(DeleteAreaTitle, "Площадка удалена");
     }
 
     private void OnCreateCargo()
     {
-        SendNotificationMessage("Добавление груза", "Груз добавлен");
+        SendNotificationMessage(CreateCargoTitle, "Груз добавлен");
     }
 
     private void OnDeleteCargo()
     {
-        SendNotificationMessage("Удаление груза", "Груз удален");
+        SendNotificationMessage(DeleteCargoTitle, "Груз удален");
     }
 
     private void SendNotificationMessage(string title, string message, NotificationSeverity severity = NotificationSeverity.Info)

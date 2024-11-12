@@ -6,7 +6,7 @@ public class CargoResponse
 
     public string Weight { get; set; } = null!;
 
-    public string LoadTime { get; set; } = null!;
+    public DateTime LoadTime { get; set; }
 
-    public string UnloadTime { get; set; } = null!;
+    public DateTime UnloadTime { get; set; }
 }

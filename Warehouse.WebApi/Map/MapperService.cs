@@ -22,8 +22,10 @@ public static class MapperService
         return new CargoResponse
         {
             Id = cargoDto.Id,
-            LoadTime = cargoDto.LoadTime.ToShortDateString(),
-            UnloadTime = cargoDto.UnloadTime?.ToShortDateString() ?? string.Empty,
+            LoadTime = cargoDto.LoadTime,
+            // LoadTime = cargoDto.LoadTime.ToShortDateString(),
+            UnloadTime = cargoDto.UnloadTime ?? DateTime.MinValue,
+            // UnloadTime = cargoDto.UnloadTime?.ToShortDateString() ?? string.Empty,
             Weight = cargoDto.Weight.ToString(CultureInfo.InvariantCulture)
         };
     }
@@ -43,9 +45,11 @@ public static class MapperService
         {
             Id = areaDto.Id,
             Name = areaDto.Name,
-            Cargo = areaDto.Cargo.ToModel(),
-            CreateTime = areaDto.CreateTime.ToShortDateString(),
-            DeleteTime = areaDto.DeleteTime?.ToShortDateString() ?? string.Empty,
+            Cargo = areaDto.Cargo.FirstOrDefault(c=>c.UnloadTime == null)?.ToModel(),
+            CreateTime = areaDto.CreateTime,
+            // CreateTime = areaDto.CreateTime.ToShortDateString(),
+            DeleteTime = areaDto.DeleteTime ?? DateTime.MinValue,
+            // DeleteTime = areaDto.DeleteTime?.ToShortDateString() ?? string.Empty,
             Pickets = areaDto.Pickets.Select(p => p.ToModel()).ToList()
         };
     }
