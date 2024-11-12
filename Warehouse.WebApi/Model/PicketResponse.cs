@@ -6,5 +6,7 @@ public class PicketResponse
 
     public string Name { get; set; } = null!;
 
+    public int WarehouseId { get; set; }
+
     // public ICollection<AreaResponse> Areas { get; set; } = null!;
 }

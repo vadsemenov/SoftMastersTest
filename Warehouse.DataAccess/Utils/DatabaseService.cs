@@ -132,10 +132,10 @@ public static class DatabaseService
         }
     }
 
-    public static void CreateAndFillWarehouseDatabase(this WarehouseDbContext context)
+    public static async Task CreateAndFillWarehouseDatabase(this WarehouseDbContext context)
     {
-        context.Database.EnsureDeleted();
-        context.Database.EnsureCreated();
+        await context.Database.EnsureDeletedAsync();
+        await context.Database.EnsureCreatedAsync();
 
         var warehouse = new Core.DTO.Warehouse
         {
@@ -143,7 +143,7 @@ public static class DatabaseService
         };
 
         context.Warehouses.Add(warehouse);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         var picket1 = new Picket
         {
@@ -170,7 +170,7 @@ public static class DatabaseService
         };
 
         context.Pickets.AddRange(picket1, picket2, picket3, picket4);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         var cargo1 = new Cargo
         {
@@ -191,7 +191,7 @@ public static class DatabaseService
         };
 
         context.Cargoes.AddRange(cargo1, cargo2);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         var area1Pickets = new List<Picket>
             {
@@ -242,6 +242,6 @@ public static class DatabaseService
         };
 
         context.Areas.AddRange(area1, area2, area3);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 }

@@ -10,7 +10,9 @@ public class AreaResponse
 
     public DateTime CreateTime { get; set; } 
 
-    public DateTime DeleteTime { get; set; } 
+    public DateTime DeleteTime { get; set; }
+
+    public int WarehouseId { get; set; }
 
     public CargoResponse Cargo { get; set; } = null!;
 

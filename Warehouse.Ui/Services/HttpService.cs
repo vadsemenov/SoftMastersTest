@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
+using System.Net.Http;
 using System.Net.Http.Json;
 using Warehouse.Ui.Model;
 
@@ -13,25 +15,38 @@ public class HttpService
         _client = client;
     }
 
-    public async Task<IList<WarehouseResponse>?> GetWarehouses()
+    public async Task<IList<WarehouseResponse>?> GetWarehousesAsync()
     {
-      return await _client.GetFromJsonAsync<List<WarehouseResponse>>("Warehouse");
-    } 
-    
-    public async Task<IList<WarehouseResponse>?> GetWarehousesByTime(DateTime time)
+        return await _client.GetFromJsonAsync<List<WarehouseResponse>>("Warehouse");
+    }
+
+    public async Task<WarehouseResponse?> CreateWarehouseAsync(WarehouseResponse warehouse)
     {
-        // https://www.jammer.biz/using-httpclient-to-send-dates-in-url-using-attributerouting/
+        using var response = await _client.PostAsJsonAsync("Warehouse", warehouse);
 
+        var res = await response.Content.ReadFromJsonAsync<WarehouseResponse>();
 
-        // var queryStringParams = new NameValueCollection
-        // {
-        //     {"startDate", time.ToQueryFormat()},
-        // };
-        //
-        // return await _client.GetFromJsonAsync<List<WarehouseResponse>>("Warehouse/ByTime" + queryStringParams.ToQueryString(true));
+        return res;
+    }
 
+    public async Task<PicketResponse?> CreatePicketAsync(PicketResponse picket)
+    {
+        using var response = await _client.PostAsJsonAsync("Picket", picket);
 
+        var res = await response.Content.ReadFromJsonAsync<PicketResponse>();
+
+        return res;
+    }
+
+    public async Task<IList<WarehouseResponse>?> GetWarehousesByTimeAsync(DateTime? time)
+    {
         var httpTime = time.ToQueryFormat();
-        return await _client.GetFromJsonAsync<List<WarehouseResponse>>($"Warehouse/{httpTime}" );
+
+        return await _client.GetFromJsonAsync<List<WarehouseResponse>>($"Warehouse/{httpTime}");
+    }
+
+    public async Task DeleteAreaAsync(AreaResponse selectedArea)
+    {
+        await _client.PutAsJsonAsync("Area", selectedArea);
     }
 }

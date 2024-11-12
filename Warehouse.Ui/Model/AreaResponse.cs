@@ -10,6 +10,8 @@ public class AreaResponse
 
     public DateTime DeleteTime { get; set; }
 
+    public int WarehouseId { get; set; }
+    
     public CargoResponse Cargo { get; set; } = null!;
 
     public ICollection<PicketResponse> Pickets { get; set; } = null!;

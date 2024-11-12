@@ -34,6 +34,13 @@ namespace Warehouse.WebApi.Controllers
 
                 warehouses = await repository.GetAllAsync();
 
+                warehouses = warehouses.Select(w =>
+                {
+                    w.Areas = w.Areas.Where(a => a.DeleteTime == null).ToList();
+
+                    return w;
+                }).ToList();
+
                 warehousesResponse = warehouses.Select(w => w.ToModel()).ToList();
             }
             catch (Exception e)
@@ -91,6 +98,31 @@ namespace Warehouse.WebApi.Controllers
             }
 
             return Ok(warehouse);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<WarehouseResponse>> CreateWarehouseAsync(WarehouseResponse warehouseResponse)
+        {
+            try
+            {
+                var warehouse = warehouseResponse.ToDto();
+
+                var repository = _unitOfWork.GetRepository<IWarehouseRepository>();
+                repository.Create(warehouse);
+                await repository.SaveAsync();
+
+                var wareHouses = await repository.GetAllAsync();
+
+                var response = warehouse.ToModel();
+
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+
+                return BadRequest();
+            }
         }
     }
 }

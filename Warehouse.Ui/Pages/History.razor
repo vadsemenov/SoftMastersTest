@@ -1,0 +1,123 @@
+﻿@page "/history"
+@using Warehouse.Ui.Services
+@using Warehouse.Ui.Model
+@inject HttpService HttpService
+@inject NotificationService NotificationService
+
+<div align="center" class="container pb-5">
+    <div class="row">
+        <h3>История складов</h3>
+        <br /><br />
+
+        <RadzenStack class="py-2" Gap="1rem" AlignItems="AlignItems.Center">
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+                <RadzenLabel Text="Выбрать дату и время" Component="DatePickerWithTime" />
+                <RadzenDatePicker @bind-Value=@_queryDateTime ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" DateFormat="MM/dd/yyyy HH:mm:ss" Name="DatePickerWithTime" />
+                <RadzenButton Shade="Shade.Light" Click=@(args => GetWarehousesByTime()) Text="Получить историю складов" ButtonStyle="ButtonStyle.Success" />
+            </RadzenStack>
+        </RadzenStack>
+
+        <div class="border border-success py-2">
+            <h4>Сводная ведомость складов:</h4>
+            @if (_warehouses == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Имя склада</th>
+                            <th>Номер площадки</th>
+                            <th>Номер пикета</th>
+                            <th>Груз на площадке(т)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var warehouse in _warehouses)
+                        {
+                            @if (!warehouse.Areas.Any() && !warehouse.Pickets.Any())
+                            {
+                                <tr>
+                                    <td>@warehouse.Name</td>
+                                    <td>Отсутствует</td>
+                                    <td>Отсутствует</td>
+                                    <td>Отсутствеут</td>
+                                </tr>
+                            }
+                            else if (!warehouse.Areas.Any() && warehouse.Pickets.Any())
+                            {
+                                @foreach (var picket in warehouse.Pickets)
+                                {
+                                    <tr>
+                                        <td>@warehouse.Name</td>
+                                        <td>Отсутствует</td>
+                                        <td>@picket.Name</td>
+                                        <td>Отсутствует</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                @foreach (var picket in warehouse.Pickets)
+                                {
+                                    <tr>
+                                        <td>@warehouse.Name</td>
+                                        <td>@GetAreaNameByPicket(warehouse, picket)</td>
+                                        <td>@picket.Name</td>
+                                        <td>@GetAreaCargoByPicket(warehouse, picket)</td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private IList<WarehouseResponse>? _warehouses;
+
+    private DateTime? _queryDateTime = DateTime.Now;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetWarehousesByTime();
+    }
+
+    private string GetAreaNameByPicket(WarehouseResponse warehouse, PicketResponse picket)
+    {
+        var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
+
+        return area?.Name ?? "Отсутствует";
+    }
+
+    private string GetAreaCargoByPicket(WarehouseResponse warehouse, PicketResponse picket)
+    {
+        var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
+
+        return area?.Cargo?.Weight ?? "Отсутствует";
+    }
+
+    private async Task GetWarehousesByTime()
+    {
+        try
+        {
+            _warehouses = await HttpService.GetWarehousesByTimeAsync(_queryDateTime);
+        }
+        catch
+        {
+            SendNotificationMessage("Получение истории", "Не удалось обновить историю!", NotificationSeverity.Error);
+        }
+
+        SendNotificationMessage("Получение истории", "История обновлена");
+    }
+
+    private void SendNotificationMessage(string title, string message, NotificationSeverity severity = NotificationSeverity.Info)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = title, Detail = message });
+    }
+}

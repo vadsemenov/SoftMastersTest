@@ -2,23 +2,78 @@
 @using Warehouse.Ui.Model
 @using Warehouse.Ui.Services
 @inject HttpService HttpService
-@* @inject HttpClient Client *@
 @inject NotificationService NotificationService
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
 
 <div align="center" class="container pb-5">
     <div class="row">
         <h3>Склады</h3>
         <br /><br />
 
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
-            <RadzenLabel Text="Select Date" Component="DatePickerWithTime" />
-            <RadzenDatePicker @bind-Value=@_newDateTime ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" DateFormat="MM/dd/yyyy HH:mm:ss" Name="DatePickerWithTime" />
-        </RadzenStack>
+        <div class="border border-success py-2">
+            <h4>Сводная ведомость складов:</h4>
+            @if (_warehouses == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Имя склада</th>
+                            <th>Номер площадки</th>
+                            <th>Номер пикета</th>
+                            <th>Груз на площадке(т)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var warehouse in _warehouses)
+                        {
+                            @if (!warehouse.Areas.Any() && !warehouse.Pickets.Any())
+                            {
+                                <tr>
+                                    <td>@warehouse.Name</td>
+                                    <td>Отсутствует</td>
+                                    <td>Отсутствует</td>
+                                    <td>Отсутствеут</td>
+                                </tr>
+                            }
+                            else if (!warehouse.Areas.Any() && warehouse.Pickets.Any())
+                            {
+                                @foreach (var picket in warehouse.Pickets)
+                                {
+                                    <tr>
+                                        <td>@warehouse.Name</td>
+                                        <td>Отсутствует</td>
+                                        <td>@picket.Name</td>
+                                        <td>Отсутствует</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                @foreach (var picket in warehouse.Pickets)
+                                {
+                                    <tr>
+                                        <td>@warehouse.Name</td>
+                                        <td>@GetAreaNameByPicket(warehouse, picket)</td>
+                                        <td>@picket.Name</td>
+                                        <td>@GetAreaCargoByPicket(warehouse, picket)</td>
+                                    </tr>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
 
         @* Список складов *@
         <div class="border border-success py-2">
             <h4>Склады</h4>
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            <RadzenDataGrid @ref="_warehouseDataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                             Data="@_warehouses" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value="@_selectedWarehouses">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(WarehouseResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
@@ -27,7 +82,7 @@
             </RadzenDataGrid>
             <RadzenStack class="py-2" Gap="1rem" AlignItems="AlignItems.Center">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-                    <RadzenButton Shade="Shade.Light" Click=@(args => OnAddWarehouse()) Text="Добавить склад" ButtonStyle="ButtonStyle.Success" />
+                    <RadzenButton Shade="Shade.Light" Click="@(args => OnAddWarehouse())" Text="Добавить склад" ButtonStyle="ButtonStyle.Success" />
                     @* <RadzenButton Shade="Shade.Light" Click=@(args => OnDeleteWarehouse()) Text="Удалить склад" ButtonStyle="ButtonStyle.Danger" /> *@
                 </RadzenStack>
             </RadzenStack>
@@ -36,7 +91,7 @@
         @* Список пикетов *@
         <div class="border border-success py-2">
             <h4 class="pt-2">Пикеты выбранного склада</h4>
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            <RadzenDataGrid @ref="_picketDataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                             Data="@_selectedWarehouses?.FirstOrDefault()?.Pickets" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Multiple" @bind-Value="@_selectedPickets">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(PicketResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
@@ -54,7 +109,7 @@
         @* Список площадок *@
         <div class="border border-success py-2">
             <h4>Площадки выбранного склада</h4>
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            <RadzenDataGrid @ref="_areaDataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                             Data="@_selectedWarehouses?.FirstOrDefault()?.Areas" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value="@_selectedAreas">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(AreaResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
@@ -74,8 +129,8 @@
         @* Список грузов *@
         <div class="border border-success py-2">
             <h4>Грузы площадок</h4>
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-                            Data="@_selectedWarehouses?.FirstOrDefault()?.Areas.Select(a=>a.Cargo)" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value="@_selectedCargoes">
+            <RadzenDataGrid @ref="_cargoDataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                            Data="@_selectedWarehouses?.FirstOrDefault()?.Areas.Select(a => a.Cargo)" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value="@_selectedCargoes">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(CargoResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
                     <RadzenDataGridColumn Property="@nameof(CargoResponse.Weight)" Title="Вес груза" Frozen="true" Width="160px" />
@@ -90,49 +145,13 @@
             </RadzenStack>
         </div>
 
-        <div class="border border-success py-2">
-            <h4>Сводная ведомость складов:</h4>
-            @if (_warehouses == null)
-            {
-                <p><em>Loading...</em></p>
-            }
-            else
-            {
-                @foreach (var warehouse in _warehouses)
-                {
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Номер склада</th>
-                                <th>Номер площадки</th>
-                                <th>Номер пикета</th>
-                                <th>Груз на площадке(т)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var area in warehouse.Areas)
-                            {
-                                @foreach (var picket in area.Pickets)
-                                {
-                                    <tr>
-                                        <td>@warehouse.Name</td>
-                                        <td>@area.Name</td>
-                                        <td>@picket.Name</td>
-                                        <td>@area.Cargo.Weight</td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                }
-            }
-        </div>
     </div>
 </div>
 
 @code {
-    private IList<WarehouseResponse>? _selectedWarehouses;
     private IList<WarehouseResponse>? _warehouses;
+
+    private IList<WarehouseResponse>? _selectedWarehouses;
     private IList<PicketResponse>? _selectedPickets;
     private IList<AreaResponse>? _selectedAreas;
     private IList<CargoResponse>? _selectedCargoes;
@@ -144,23 +163,190 @@
     private const string CreateCargoTitle = "Добавление груза";
     private const string DeleteCargoTitle = "Удаление груза";
 
-    private DateTime? _newDateTime = DateTime.Now;
+    private string _newWarehouseName = string.Empty;
+    private string _newPicketName = string.Empty;
+    private RadzenDataGrid<WarehouseResponse>? _warehouseDataGrid;
+    private RadzenDataGrid<PicketResponse>? _picketDataGrid;
+    private RadzenDataGrid<AreaResponse>? _areaDataGrid;
+    private RadzenDataGrid<CargoResponse>? _cargoDataGrid;
+
+    private DateTime? _areaDeleteTime = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
-        _warehouses = await HttpService.GetWarehouses();
+        _warehouses = await HttpService.GetWarehousesAsync();
     }
 
-    private void OnAddWarehouse()
+    private string GetAreaNameByPicket(WarehouseResponse warehouse, PicketResponse picket)
     {
-       var time = HttpService.GetWarehousesByTime(DateTime.Now);
+        var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
 
-        SendNotificationMessage(AddWarehouseTitle, "Склад добавлен");
+        return area?.Name ?? "Отсутствует";
     }
 
-    private void OnAddPicket()
+    private string GetAreaCargoByPicket(WarehouseResponse warehouse, PicketResponse picket)
     {
-        SendNotificationMessage(AddPicketTitle, "Пикет добавлен");
+        var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
+
+        return area?.Cargo?.Weight ?? "Отсутствует";
+    }
+
+    private async Task ReloadPagesData()
+    {
+        _warehouses = await HttpService.GetWarehousesAsync();
+        _selectedWarehouses = null;
+        _selectedPickets = null;
+        _selectedAreas = null;
+        _selectedCargoes = null;
+
+        // await _picketDataGrid.Reload();
+        // NavigationManager.NavigateTo(NavigationManager.Uri);
+    }
+
+    private async Task<bool> ShowNewWarehouseDialog()
+    {
+        var result = await DialogService.OpenAsync("Добавить склад", ds =>
+    @<RadzenStack Gap="1.5rem">
+        <RadzenCard>
+            <RadzenTextArea Placeholder="Введите имя..." @bind-Value=@_newWarehouseName Style="width: 100%" aria-label="Добавить склад" />
+        </RadzenCard>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="width: 80px;" />
+                <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+    );
+
+        return result is true;
+    }
+
+    private async Task<bool> ShowNewPicketDialog()
+    {
+        var result = await DialogService.OpenAsync("Добавить пикет", ds =>
+    @<RadzenStack Gap="1.5rem">
+        <RadzenCard>
+            <RadzenTextArea Placeholder="Введите имя..." @bind-Value=@_newPicketName Style="width: 100%" aria-label="Добавить пикет" />
+        </RadzenCard>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="width: 80px;" />
+                <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+    );
+
+        return result is true;
+    }
+
+    private async Task<bool> ShowDeleteAreaDialog()
+    {
+        var result = await DialogService.OpenAsync("Удаление площадки", ds =>
+    @<RadzenStack Gap="1.5rem">
+        <RadzenCard>
+            <RadzenStack class="py-2" Gap="1rem" AlignItems="AlignItems.Center">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+                    <RadzenLabel Text="Выбрать дату и время" Component="DatePickerWithTime" />
+                    <RadzenDatePicker @bind-Value=@_areaDeleteTime ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" DateFormat="MM/dd/yyyy HH:mm:ss" Name="DatePickerWithTime" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Ok" Click="() => ds.Close(true)" Style="width: 80px;" />
+                <RadzenButton Text="Cancel" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+    );
+
+        return result is true;
+    }
+
+    private async Task OnAddWarehouse()
+    {
+        try
+        {
+            var result = await ShowNewWarehouseDialog();
+
+            if (result)
+            {
+                if (!string.IsNullOrEmpty(_newWarehouseName))
+                {
+                    var newWarehouse = await HttpService.CreateWarehouseAsync(new WarehouseResponse
+                        {
+                            Name = _newWarehouseName,
+                            Areas = new List<AreaResponse>(),
+                            Pickets = new List<PicketResponse>()
+                        });
+                    if (newWarehouse != null)
+                    {
+                        await ReloadPagesData();
+
+                        SendNotificationMessage(AddWarehouseTitle, "Склад добавлен");
+                    }
+                }
+                else
+                {
+                    SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить склад! Имя не должно быть пустым!", NotificationSeverity.Error);
+                }
+            }
+        }
+        catch
+        {
+            SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить склад!", NotificationSeverity.Error);
+        }
+
+    }
+
+    private async Task OnAddPicket()
+    {
+        try
+        {
+            if (_selectedWarehouses == null
+                || !_selectedWarehouses!.Any())
+            {
+                SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить пикет! Должен быть выбран склад!", NotificationSeverity.Error);
+                return;
+            }
+
+            var result = await ShowNewPicketDialog();
+
+            if (result
+                && !string.IsNullOrEmpty(_newPicketName)
+                && _selectedWarehouses!.First().Pickets.All(p => p.Name.ToUpper() != _newPicketName.ToUpper()))
+            {
+                if (result)
+                {
+                    var newPicket = await HttpService.CreatePicketAsync(new PicketResponse
+                        {
+                            Name = _newPicketName,
+                            WarehouseId = _selectedWarehouses.First().Id
+                        });
+
+                    if (newPicket != null)
+                    {
+                        await ReloadPagesData();
+
+                        SendNotificationMessage(AddPicketTitle, "Пикет добавлен");
+                    }
+                }
+                else
+                {
+                    SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить пикет!", NotificationSeverity.Error);
+                }
+            }
+            else
+            {
+                SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить пикет! Имя должно быть уникальным!", NotificationSeverity.Error);
+            }
+        }
+        catch
+        {
+            SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить пикет!", NotificationSeverity.Error);
+        }
     }
 
     private void OnAddArea()
@@ -168,9 +354,41 @@
         SendNotificationMessage(AddAreaTitle, "Площадка добавлена");
     }
 
-    private void OnDeleteArea()
+    private async Task OnDeleteArea()
     {
-        SendNotificationMessage(DeleteAreaTitle, "Площадка удалена");
+        if (_selectedAreas == null || !_selectedAreas.Any())
+        {
+            SendNotificationMessage(DeleteAreaTitle, "Необходимо выбрать площадку!");
+            return;
+        }
+
+        var selectedArea = _selectedAreas.First();
+
+        try
+        {
+            var result = await ShowDeleteAreaDialog();
+
+            if (result)
+            {
+                if (_areaDeleteTime < selectedArea.CreateTime)
+                {
+                    SendNotificationMessage(DeleteAreaTitle, "Время удаления площадки должно быть позже ее создания");
+                    return;
+                }
+
+                selectedArea.DeleteTime = _areaDeleteTime!.Value;
+
+                await HttpService.DeleteAreaAsync(selectedArea);
+
+                await ReloadPagesData();
+
+                SendNotificationMessage(AddPicketTitle, "Площадка и груз удалены!");
+            }
+        }
+        catch
+        {
+            SendNotificationMessage(DeleteAreaTitle, "Не удалось удалить площадку!");
+        }
     }
 
     private void OnCreateCargo()
@@ -187,4 +405,6 @@
     {
         NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = title, Detail = message });
     }
+
 }
+

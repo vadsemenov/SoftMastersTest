@@ -17,16 +17,40 @@ public static class MapperService
         };
     }
 
-    public static CargoResponse ToModel(this Cargo cargoDto)
+    public static Core.DTO.Warehouse ToDto(this WarehouseResponse warehouse)
     {
-        return new CargoResponse
+        return new Core.DTO.Warehouse
         {
-            Id = cargoDto.Id,
-            LoadTime = cargoDto.LoadTime,
-            // LoadTime = cargoDto.LoadTime.ToShortDateString(),
-            UnloadTime = cargoDto.UnloadTime ?? DateTime.MinValue,
-            // UnloadTime = cargoDto.UnloadTime?.ToShortDateString() ?? string.Empty,
-            Weight = cargoDto.Weight.ToString(CultureInfo.InvariantCulture)
+            Id = warehouse.Id,
+            Name = warehouse.Name,
+            Areas = warehouse.Areas.Select(a => a.ToDto()).ToList(),
+            Pickets = warehouse.Pickets.Select(p => p.ToDto()).ToList()
+        };
+    }
+
+    public static AreaResponse ToModel(this Area areaDto)
+    {
+        return new AreaResponse
+        {
+            Id = areaDto.Id,
+            Name = areaDto.Name,
+            Cargo = areaDto.Cargo.FirstOrDefault(c=>c.UnloadTime == null)?.ToModel(),
+            CreateTime = areaDto.CreateTime,
+            DeleteTime = areaDto.DeleteTime ?? DateTime.MinValue,
+            Pickets = areaDto.Pickets.Select(p => p.ToModel()).ToList()
+        };
+    }
+
+    public static Area ToDto(this AreaResponse area)
+    {
+        return new Area
+        {
+            Id = area.Id,
+            Name = area.Name,
+            CreateTime = area.CreateTime,
+            DeleteTime = area.DeleteTime,
+            Cargo = new List<Cargo>(),
+            Pickets = area.Pickets.Select(p => p.ToDto()).ToList()
         };
     }
 
@@ -39,18 +63,26 @@ public static class MapperService
         };
     }
 
-    public static AreaResponse ToModel(this Area areaDto)
+    public static Picket ToDto(this PicketResponse picket)
     {
-        return new AreaResponse
+        return new Picket
         {
-            Id = areaDto.Id,
-            Name = areaDto.Name,
-            Cargo = areaDto.Cargo.FirstOrDefault(c=>c.UnloadTime == null)?.ToModel(),
-            CreateTime = areaDto.CreateTime,
-            // CreateTime = areaDto.CreateTime.ToShortDateString(),
-            DeleteTime = areaDto.DeleteTime ?? DateTime.MinValue,
-            // DeleteTime = areaDto.DeleteTime?.ToShortDateString() ?? string.Empty,
-            Pickets = areaDto.Pickets.Select(p => p.ToModel()).ToList()
+            // Id = picket.Id,
+            Name = picket.Name,
+            Areas = new List<Area>()
+        };
+    }
+
+    public static CargoResponse ToModel(this Cargo cargoDto)
+    {
+        return new CargoResponse
+        {
+            Id = cargoDto.Id,
+            LoadTime = cargoDto.LoadTime,
+            // LoadTime = cargoDto.LoadTime.ToShortDateString(),
+            UnloadTime = cargoDto.UnloadTime ?? DateTime.MinValue,
+            // UnloadTime = cargoDto.UnloadTime?.ToShortDateString() ?? string.Empty,
+            Weight = cargoDto.Weight.ToString(CultureInfo.InvariantCulture)
         };
     }
 }

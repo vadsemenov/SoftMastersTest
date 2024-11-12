@@ -5,6 +5,12 @@ namespace Warehouse.Ui.Services;
 
 public static class QueryStringService
 {
+    // https://www.jammer.biz/using-httpclient-to-send-dates-in-url-using-attributerouting/
+    // var queryStringParams = new NameValueCollection
+    // {
+    //     {"startDate", time.ToQueryFormat()},
+    // };
+
     public static string ToQueryString(this NameValueCollection source, bool removeEmptyEntries)
     {
         return source != null ? "?" + String.Join("&", source.AllKeys
@@ -16,8 +22,13 @@ public static class QueryStringService
             : string.Empty;
     }
 
-    public static string ToQueryFormat(this DateTime time)
+    public static string ToQueryFormat(this DateTime? time)
     {
-        return $"{time.Year}-{time.Month}-{time.Day}T{time.ToLongTimeString()}";
+        if (time == null)
+        {
+            return string.Empty;
+        }
+
+        return $"{time.Value.Year}-{time.Value.Month}-{time.Value.Day}T{time.Value.ToLongTimeString()}";
     }
 }
