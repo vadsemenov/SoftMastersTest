@@ -1,4 +1,4 @@
-﻿namespace Warehouse.WebApi.Model;
+﻿namespace Warehouse.Model.Model;
 
 public class WarehouseResponse
 {

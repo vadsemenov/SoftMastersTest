@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Warehouse.Core.DTO;
 using Warehouse.DataAccess.Repositories.Interfaces;
 using Warehouse.DataAccess.UOW;
 using Warehouse.WebApi.Map;
-using Warehouse.WebApi.Model;
+using Warehouse.Model.Model;
 
 namespace Warehouse.WebApi.Controllers;
 

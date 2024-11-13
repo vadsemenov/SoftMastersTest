@@ -1,4 +1,4 @@
-﻿namespace Warehouse.Ui.Model;
+﻿namespace Warehouse.Model.Model;
 
 public class CargoResponse
 {

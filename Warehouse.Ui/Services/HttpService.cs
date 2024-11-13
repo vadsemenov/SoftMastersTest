@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Net.Http.Json;
-using Warehouse.Ui.Model;
+using Warehouse.Model.Model;
 
 namespace Warehouse.Ui.Services;
 

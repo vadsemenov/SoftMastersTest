@@ -12,4 +12,8 @@
     <PackageReference Include="Radzen.Blazor" Version="5.5.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Warehouse.Model\Warehouse.Model.csproj" />
+  </ItemGroup>
+
 </Project>

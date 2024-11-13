@@ -1,9 +1,10 @@
 ﻿using System.Globalization;
 using Warehouse.Core.DTO;
-using Warehouse.WebApi.Model;
+using Warehouse.Model.Model;
 
 namespace Warehouse.WebApi.Map;
 
+//Сервис конвертирует классы из DTO в Rest 
 public static class MapperService
 {
     public static WarehouseResponse ToModel(this Core.DTO.Warehouse warehouseDto)
@@ -34,7 +35,7 @@ public static class MapperService
         {
             Id = areaDto.Id,
             Name = areaDto.Name,
-            Cargo = areaDto.Cargoes.Select(c=>c.ToModel()).ToList(),
+            Cargo = areaDto.Cargoes.Select(c => c.ToModel()).ToList(),
             CreateTime = areaDto.CreateTime,
             DeleteTime = areaDto.DeleteTime ?? DateTime.MinValue,
             Pickets = areaDto.Pickets.Select(p => p.ToModel()).ToList()
@@ -79,24 +80,20 @@ public static class MapperService
         {
             Id = cargoDto.Id,
             LoadTime = cargoDto.LoadTime,
-            // LoadTime = cargoDto.LoadTime.ToShortDateString(),
             UnloadTime = cargoDto.UnloadTime ?? DateTime.MinValue,
-            // UnloadTime = cargoDto.UnloadTime?.ToShortDateString() ?? string.Empty,
-            Weight = cargoDto.Weight.ToString("##.###",CultureInfo.InvariantCulture)
+            Weight = cargoDto.Weight.ToString("##.###", CultureInfo.InvariantCulture)
         };
     }
     public static Cargo ToDto(this CargoResponse cargoResponse)
     {
-        decimal weight = 0.000M;
+        var weight = 0.000M;
         decimal.TryParse(cargoResponse.Weight, out weight);
 
         return new Cargo
         {
             Id = cargoResponse.Id,
             LoadTime = cargoResponse.LoadTime,
-            // LoadTime = cargoDto.LoadTime.ToShortDateString(),
-            // UnloadTime = cargoDto.UnloadTime?.ToShortDateString() ?? string.Empty,
-            Weight =  weight
+            Weight = weight
         };
     }
 }

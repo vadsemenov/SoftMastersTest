@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Utils", "Warehous
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.WebApi", "Warehouse.WebApi\Warehouse.WebApi.csproj", "{54AB2C53-BFA0-4E39-9F0F-8BDDBA1E8E88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Ui", "Warehouse.Ui\Warehouse.Ui.csproj", "{DAA7583E-20A2-4ED3-B90D-EB739C2A72CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Warehouse.Ui", "Warehouse.Ui\Warehouse.Ui.csproj", "{DAA7583E-20A2-4ED3-B90D-EB739C2A72CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Model", "Warehouse.Model\Warehouse.Model.csproj", "{79360E08-1B84-4CA5-8229-115DF872DE8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{DAA7583E-20A2-4ED3-B90D-EB739C2A72CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAA7583E-20A2-4ED3-B90D-EB739C2A72CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAA7583E-20A2-4ED3-B90D-EB739C2A72CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79360E08-1B84-4CA5-8229-115DF872DE8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79360E08-1B84-4CA5-8229-115DF872DE8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79360E08-1B84-4CA5-8229-115DF872DE8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79360E08-1B84-4CA5-8229-115DF872DE8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

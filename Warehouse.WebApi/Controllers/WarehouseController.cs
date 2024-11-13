@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Warehouse.DataAccess;
 using Warehouse.DataAccess.Repositories.Interfaces;
 using Warehouse.DataAccess.UOW;
 using Warehouse.WebApi.Map;
-using Warehouse.WebApi.Model;
+using Warehouse.Model.Model;
 
 namespace Warehouse.WebApi.Controllers
 {
@@ -25,14 +24,13 @@ namespace Warehouse.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<ICollection<WarehouseResponse>>> GetAllWarehousesAsync()
         {
-            ICollection<Core.DTO.Warehouse> warehouses = new List<Core.DTO.Warehouse>();
-            ICollection<WarehouseResponse> warehousesResponse = new List<WarehouseResponse>();
+            ICollection<WarehouseResponse> warehousesResponse;
 
             try
             {
                 var repository = _unitOfWork.GetRepository<IWarehouseRepository>();
 
-                warehouses = await repository.GetAllAsync();
+                ICollection<Core.DTO.Warehouse> warehouses = await repository.GetAllAsync();
 
                 warehouses = warehouses.Select(w =>
                 {
@@ -65,17 +63,16 @@ namespace Warehouse.WebApi.Controllers
         [HttpGet("{dateTime:DateTime}")]
         public async Task<ActionResult<ICollection<WarehouseResponse>>> GetAllWarehousesAsync(DateTime dateTime)
         {
-            ICollection<Core.DTO.Warehouse> warehouses = new List<Core.DTO.Warehouse>();
-            ICollection<WarehouseResponse> warehousesResponse = new List<WarehouseResponse>();
+            ICollection<WarehouseResponse> warehousesResponse;
 
             try
             {
                 var repository = _unitOfWork.GetRepository<IWarehouseRepository>();
 
-                warehouses = await repository.GetAllAsync();
+                ICollection<Core.DTO.Warehouse> warehouses = await repository.GetAllAsync();
 
                 warehouses = warehouses
-                    .Select(w=>
+                    .Select(w =>
                     {
                         w.Areas = w.Areas
                             .Where(a => a.CreateTime <= dateTime && (a.DeleteTime >= dateTime || a.DeleteTime == null))
@@ -139,8 +136,6 @@ namespace Warehouse.WebApi.Controllers
                 var repository = _unitOfWork.GetRepository<IWarehouseRepository>();
                 repository.Create(warehouse);
                 await repository.SaveAsync();
-
-                var wareHouses = await repository.GetAllAsync();
 
                 var response = warehouse.ToModel();
 

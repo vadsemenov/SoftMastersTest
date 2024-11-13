@@ -2,7 +2,6 @@
 using Warehouse.DataAccess.Repositories.Interfaces;
 using Warehouse.DataAccess.UOW;
 using Warehouse.Utils;
-using StringComparer = Warehouse.Utils.StringComparer;
 
 namespace Warehouse.DataAccess.Utils;
 

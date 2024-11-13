@@ -1,6 +1,4 @@
-﻿using Warehouse.Core.DTO;
-
-namespace Warehouse.WebApi.Model;
+﻿namespace Warehouse.Model.Model;
 
 public class AreaResponse
 {
@@ -8,7 +6,7 @@ public class AreaResponse
 
     public string Name { get; set; } = null!;
 
-    public DateTime CreateTime { get; set; } 
+    public DateTime CreateTime { get; set; }
 
     public DateTime DeleteTime { get; set; }
 

@@ -2,7 +2,7 @@
 using Warehouse.DataAccess.Repositories.Interfaces;
 using Warehouse.DataAccess.UOW;
 using Warehouse.WebApi.Map;
-using Warehouse.WebApi.Model;
+using Warehouse.Model.Model;
 
 namespace Warehouse.WebApi.Controllers;
 
@@ -37,7 +37,6 @@ public class PicketController : ControllerBase
             picketRepository.Create(picket);
             await picketRepository.SaveAsync();
 
-            // warehouse?.Pickets.Add(picket);
             await warehouseRepository.SaveAsync();
 
             var response = picket.ToModel();

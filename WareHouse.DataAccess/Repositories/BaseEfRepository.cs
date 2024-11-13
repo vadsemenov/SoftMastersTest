@@ -11,7 +11,7 @@ public abstract class BaseEfRepository<T> : IMainRepository<T> where T : class
 
     protected BaseEfRepository(DbContext dbContext)
     {
-        DbContext = dbContext ?? throw new Exception("DbContext is null!"); ;
+        DbContext = dbContext ?? throw new Exception("DbContext is null!"); 
 
         DbSet = dbContext.Set<T>();
     }

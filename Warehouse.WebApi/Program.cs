@@ -17,7 +17,6 @@ builder.Services.AddCors(policy =>
         .AllowAnyMethod());
 });
 
-// https://github.com/dotnet/efcore/issues/15218
 builder.Services.AddDbContext<WarehouseDbContext>(options =>
 {
     options
@@ -25,21 +24,7 @@ builder.Services.AddDbContext<WarehouseDbContext>(options =>
         .UseSqlite(builder.Configuration.GetConnectionString("SqLite"));
 });
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>(
-    // options =>
-// {
-    // var dbContext = options.GetRequiredService<WarehouseDbContext>();
-    //
-    // dbContext.Database.EnsureDeletedAsync().GetAwaiter().GetResult();
-    // dbContext.Database.EnsureCreatedAsync().GetAwaiter().GetResult();
-    //
-    // var unitOfWork = new UnitOfWork(dbContext);
-    //
-    // unitOfWork.CreateAndFillWarehouseDatabaseWithUowAsync().GetAwaiter().GetResult();
-    //
-    // return unitOfWork;
-// }
-    );
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddControllers();
 
@@ -48,7 +33,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
-//Fill database with test data
+//Заполнение базы тестовыми данными
 using var dbContext = new WarehouseDbContext();
 dbContext?.CreateAndFillWarehouseDatabase();
 
