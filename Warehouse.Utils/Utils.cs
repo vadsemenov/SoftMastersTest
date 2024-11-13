@@ -8,7 +8,7 @@ public static class Utils
     {
         if (pickets.Count == 1)
         {
-            return pickets[0].Name;
+            return pickets[0].Name.ToString();
         }
 
         return pickets.First().Name + "-" + pickets.Last().Name;

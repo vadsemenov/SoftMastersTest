@@ -28,25 +28,25 @@ public static class DatabaseService
 
             var picket1 = new Picket
             {
-                Name = "101",
+                Name = 101,
                 Warehouse = warehouse
             };
 
             var picket2 = new Picket
             {
-                Name = "102",
+                Name = 102,
                 Warehouse = warehouse
             };
 
             var picket3 = new Picket
             {
-                Name = "103",
+                Name = 103,
                 Warehouse = warehouse
             };
 
             var picket4 = new Picket
             {
-                Name = "104",
+                Name = 104,
                 Warehouse = warehouse
             };
 
@@ -76,21 +76,21 @@ public static class DatabaseService
             {
                 picket1, picket2
             }
-                .OrderBy(p => p.Name, new StringComparer())
+                .OrderBy(p => p.Name)
                 .ToList();
 
             var area2Pickets = new List<Picket>
             {
                 picket3
             }
-                .OrderBy(p => p.Name, new StringComparer())
+                .OrderBy(p => p.Name)
                 .ToList();
 
             var area3Pickets = new List<Picket>
             {
                 picket4
             }
-                .OrderBy(p => p.Name, new StringComparer())
+                .OrderBy(p => p.Name)
                 .ToList();
 
             var area1 = new Area
@@ -147,25 +147,25 @@ public static class DatabaseService
 
         var picket1 = new Picket
         {
-            Name = "101",
+            Name = 101,
             Warehouse = warehouse
         };
 
         var picket2 = new Picket
         {
-            Name = "102",
+            Name = 102,
             Warehouse = warehouse
         };
 
         var picket3 = new Picket
         {
-            Name = "103",
+            Name = 103,
             Warehouse = warehouse
         };
 
         var picket4 = new Picket
         {
-            Name = "104",
+            Name = 104,
             Warehouse = warehouse
         };
 
@@ -175,7 +175,7 @@ public static class DatabaseService
         var cargo1 = new Cargo
         {
             LoadTime = new DateTime(new DateOnly(2024, 10, 31), TimeOnly.Parse("10:00:00")),
-            Weight = 5002
+            Weight = 5002.003M
         };
 
         var cargo2 = new Cargo
@@ -197,21 +197,21 @@ public static class DatabaseService
             {
                 picket1, picket2
             }
-            .OrderBy(p => p.Name, new StringComparer())
+            .OrderBy(p => p.Name)
             .ToList();
 
         var area2Pickets = new List<Picket>
             {
                 picket3
             }
-            .OrderBy(p => p.Name, new StringComparer())
+            .OrderBy(p => p.Name)
             .ToList();
 
         var area3Pickets = new List<Picket>
             {
                 picket4
             }
-            .OrderBy(p => p.Name, new StringComparer())
+            .OrderBy(p => p.Name)
             .ToList();
 
         var area1 = new Area

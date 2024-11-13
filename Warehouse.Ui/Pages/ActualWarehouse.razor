@@ -219,7 +219,7 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
-        );
+    );
 
         return result is true;
     }
@@ -244,7 +244,7 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
-        );
+    );
 
         return result is true;
     }
@@ -323,26 +323,20 @@
 
             if (result
                 && !string.IsNullOrEmpty(_newName)
-                && _selectedWarehouses!.First().Pickets.All(p => p.Name.ToUpper() != _newName.ToUpper()))
+                && int.TryParse(_newName, out var picketName)
+                && _selectedWarehouses!.First().Pickets.All(p => p.Name != picketName))
             {
-                if (result)
-                {
-                    var newPicket = await HttpService.CreatePicketAsync(new PicketResponse
-                        {
-                            Name = _newName,
-                            WarehouseId = _selectedWarehouses.First().Id
-                        });
-
-                    if (newPicket != null)
+                var newPicket = await HttpService.CreatePicketAsync(new PicketResponse
                     {
-                        await ReloadPagesData();
+                        Name = picketName,
+                        WarehouseId = _selectedWarehouses.First().Id
+                    });
 
-                        SendNotificationMessage(AddPicketTitle, "Пикет добавлен");
-                    }
-                }
-                else
+                if (newPicket != null)
                 {
-                    SendNotificationMessage(AddPicketTitle, "Не удалось добавить пикет!", NotificationSeverity.Error);
+                    await ReloadPagesData();
+
+                    SendNotificationMessage(AddPicketTitle, "Пикет добавлен");
                 }
             }
             else

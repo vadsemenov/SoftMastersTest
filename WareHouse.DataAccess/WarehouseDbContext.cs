@@ -56,11 +56,11 @@ public class WarehouseDbContext : DbContext
                 .HasPrecision(3);
         });
 
-        modelBuilder.Entity<Picket>(builder =>
-        {
-            builder.Property(picket => picket.Name)
-                .HasMaxLength(60);
-        });
+        // modelBuilder.Entity<Picket>(builder =>
+        // {
+        //     builder.Property(picket => picket.Name)
+        //         .HasMaxLength(60);
+        // });
     }
 }
 

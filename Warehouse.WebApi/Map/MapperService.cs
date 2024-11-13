@@ -82,12 +82,12 @@ public static class MapperService
             // LoadTime = cargoDto.LoadTime.ToShortDateString(),
             UnloadTime = cargoDto.UnloadTime ?? DateTime.MinValue,
             // UnloadTime = cargoDto.UnloadTime?.ToShortDateString() ?? string.Empty,
-            Weight = cargoDto.Weight.ToString(CultureInfo.InvariantCulture)
+            Weight = cargoDto.Weight.ToString("##.###",CultureInfo.InvariantCulture)
         };
     }
     public static Cargo ToDto(this CargoResponse cargoResponse)
     {
-        decimal weight = 0.0M;
+        decimal weight = 0.000M;
         decimal.TryParse(cargoResponse.Weight, out weight);
 
         return new Cargo

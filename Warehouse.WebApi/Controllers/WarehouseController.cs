@@ -74,6 +74,26 @@ namespace Warehouse.WebApi.Controllers
 
                 warehouses = await repository.GetAllAsync();
 
+                warehouses = warehouses
+                    .Select(w=>
+                    {
+                        w.Areas = w.Areas
+                            .Where(a => a.CreateTime <= dateTime && (a.DeleteTime >= dateTime || a.DeleteTime == null))
+                            .Select(a =>
+                            {
+                                a.Cargoes = a.Cargoes
+                                    .Where(c => c.LoadTime <= dateTime &&
+                                                (c.UnloadTime >= dateTime || c.UnloadTime == null))
+                                    .ToList();
+
+                                return a;
+                            })
+                            .ToList();
+
+                        return w;
+                    })
+                .ToList();
+
                 warehousesResponse = warehouses.Select(w => w.ToModel()).ToList();
             }
             catch (Exception e)

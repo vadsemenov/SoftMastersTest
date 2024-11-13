@@ -2,7 +2,7 @@
 
 public class Picket : BaseEntity
 {
-    public string Name { get; set; } = null!;
+    public int Name { get; set; }
 
     public virtual Warehouse Warehouse { get; set; } = null!;
 
