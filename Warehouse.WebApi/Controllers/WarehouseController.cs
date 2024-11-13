@@ -40,7 +40,7 @@ namespace Warehouse.WebApi.Controllers
                         .Where(a => a.DeleteTime == null || a.DeleteTime == DateTime.MinValue)
                         .Select(a =>
                         {
-                            a.Cargo = a.Cargo.Where(c => c.UnloadTime == null || c.UnloadTime == DateTime.MinValue)
+                            a.Cargoes = a.Cargoes.Where(c => c.UnloadTime == null || c.UnloadTime == DateTime.MinValue)
                                 .ToList();
 
                             return a;

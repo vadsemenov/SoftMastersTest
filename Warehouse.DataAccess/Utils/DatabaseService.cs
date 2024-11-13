@@ -97,7 +97,7 @@ public static class DatabaseService
             {
                 Name = area1Pickets.GetAreaName(),
                 Warehouse = warehouse,
-                Cargo = new List<Cargo> { cargo1 },
+                Cargoes = new List<Cargo> { cargo1 },
                 Pickets = area1Pickets,
                 CreateTime = new DateTime(new DateOnly(2024, 10, 31), TimeOnly.Parse("10:00:00"))
             };
@@ -106,7 +106,7 @@ public static class DatabaseService
             {
                 Name = area2Pickets.GetAreaName(),
                 Warehouse = warehouse,
-                Cargo = new List<Cargo> { cargo2 },
+                Cargoes = new List<Cargo> { cargo2 },
                 Pickets = area2Pickets,
                 CreateTime = new DateTime(new DateOnly(2024, 10, 31), TimeOnly.Parse("15:00:00"))
             };
@@ -115,7 +115,7 @@ public static class DatabaseService
             {
                 Name = area3Pickets.GetAreaName(),
                 Warehouse = warehouse,
-                Cargo = new List<Cargo> { cargo3 },
+                Cargoes = new List<Cargo> { cargo3 },
                 Pickets = area3Pickets,
                 CreateTime = new DateTime(new DateOnly(2024, 10, 31), TimeOnly.Parse("15:00:00"))
             };
@@ -218,7 +218,7 @@ public static class DatabaseService
         {
             Name = area1Pickets.GetAreaName(),
             Warehouse = warehouse,
-            Cargo = new List<Cargo> { cargo1 },
+            Cargoes = new List<Cargo> { cargo1 },
             Pickets = area1Pickets,
             CreateTime = new DateTime(new DateOnly(2024, 10, 31), TimeOnly.Parse("10:00:00"))
         };
@@ -227,7 +227,7 @@ public static class DatabaseService
         {
             Name = area2Pickets.GetAreaName(),
             Warehouse = warehouse,
-            Cargo = new List<Cargo> { cargo2 },
+            Cargoes = new List<Cargo> { cargo2 },
             Pickets = area2Pickets,
             CreateTime = new DateTime(new DateOnly(2024, 10, 31), TimeOnly.Parse("15:00:00"))
         };
@@ -236,7 +236,7 @@ public static class DatabaseService
         {
             Name = area3Pickets.GetAreaName(),
             Warehouse = warehouse,
-            Cargo = new List<Cargo> { cargo3 },
+            Cargoes = new List<Cargo> { cargo3 },
             Pickets = area3Pickets,
             CreateTime = new DateTime(new DateOnly(2024, 10, 31), TimeOnly.Parse("15:00:00"))
         };

@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Warehouse.Ui.Model
 @using Warehouse.Ui.Services
+@using System.Globalization
 @inject HttpService HttpService
 @inject NotificationService NotificationService
 @inject DialogService DialogService
@@ -15,7 +16,9 @@
             <h4>Сводная ведомость складов:</h4>
             @if (_warehouses == null)
             {
-                <p><em>Loading...</em></p>
+                <p>
+                    <em>Loading...</em>
+                </p>
             }
             else
             {
@@ -163,14 +166,13 @@
     private const string CreateCargoTitle = "Добавление груза";
     private const string DeleteCargoTitle = "Удаление груза";
 
-    private string _newWarehouseName = string.Empty;
-    private string _newPicketName = string.Empty;
+    private string _newName = string.Empty;
     private RadzenDataGrid<WarehouseResponse>? _warehouseDataGrid;
     private RadzenDataGrid<PicketResponse>? _picketDataGrid;
     private RadzenDataGrid<AreaResponse>? _areaDataGrid;
     private RadzenDataGrid<CargoResponse>? _cargoDataGrid;
 
-    private DateTime? _deleteTime = DateTime.Now;
+    private DateTime? _tempTime = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
@@ -203,12 +205,12 @@
         // NavigationManager.NavigateTo(NavigationManager.Uri);
     }
 
-    private async Task<bool> ShowNewWarehouseDialog()
+    private async Task<bool> ShowNewDialog(string title)
     {
-        var result = await DialogService.OpenAsync("Добавить склад", ds =>
+        var result = await DialogService.OpenAsync(title, ds =>
     @<RadzenStack Gap="1.5rem">
         <RadzenCard>
-            <RadzenTextArea Placeholder="Введите имя..." @bind-Value=@_newWarehouseName Style="width: 100%" aria-label="Добавить склад" />
+            <RadzenTextArea Placeholder="Введите имя..." @bind-Value=@_newName Style="width: 100%" aria-label="Добавить склад" />
         </RadzenCard>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
             <RadzenStack Orientation="Orientation.Horizontal">
@@ -222,12 +224,18 @@
         return result is true;
     }
 
-    private async Task<bool> ShowNewPicketDialog()
+    private async Task<bool> ShowNewCargoDialog()
     {
-        var result = await DialogService.OpenAsync("Добавить пикет", ds =>
+        var result = await DialogService.OpenAsync("Добавление нового груза", ds =>
     @<RadzenStack Gap="1.5rem">
         <RadzenCard>
-            <RadzenTextArea Placeholder="Введите имя..." @bind-Value=@_newPicketName Style="width: 100%" aria-label="Добавить пикет" />
+            <RadzenTextArea Placeholder="Введите вес т. ..." @bind-Value=@_newName Style="width: 100%" aria-label="Добавить склад" />
+            <RadzenStack class="py-2" Gap="1rem" AlignItems="AlignItems.Center">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+                    <RadzenLabel Text="Выбрать дату и время загрузки" Component="DatePickerWithTime" />
+                    <RadzenDatePicker @bind-Value=@_tempTime ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" DateFormat="MM/dd/yyyy HH:mm:ss" Name="DatePickerWithTime" />
+                </RadzenStack>
+            </RadzenStack>
         </RadzenCard>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
             <RadzenStack Orientation="Orientation.Horizontal">
@@ -249,7 +257,7 @@
             <RadzenStack class="py-2" Gap="1rem" AlignItems="AlignItems.Center">
                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
                     <RadzenLabel Text="Выбрать дату и время" Component="DatePickerWithTime" />
-                    <RadzenDatePicker @bind-Value=@_deleteTime ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" DateFormat="MM/dd/yyyy HH:mm:ss" Name="DatePickerWithTime" />
+                    <RadzenDatePicker @bind-Value=@_tempTime ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" DateFormat="MM/dd/yyyy HH:mm:ss" Name="DatePickerWithTime" />
                 </RadzenStack>
             </RadzenStack>
         </RadzenCard>
@@ -269,15 +277,15 @@
     {
         try
         {
-            var result = await ShowNewWarehouseDialog();
+            var result = await ShowNewDialog("Добавить склад");
 
             if (result)
             {
-                if (!string.IsNullOrEmpty(_newWarehouseName))
+                if (!string.IsNullOrEmpty(_newName))
                 {
                     var newWarehouse = await HttpService.CreateWarehouseAsync(new WarehouseResponse
                         {
-                            Name = _newWarehouseName,
+                            Name = _newName,
                             Areas = new List<AreaResponse>(),
                             Pickets = new List<PicketResponse>()
                         });
@@ -298,7 +306,6 @@
         {
             SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить склад!", NotificationSeverity.Error);
         }
-
     }
 
     private async Task OnAddPicket()
@@ -312,17 +319,17 @@
                 return;
             }
 
-            var result = await ShowNewPicketDialog();
+            var result = await ShowNewDialog("Добавить пикет");
 
             if (result
-                && !string.IsNullOrEmpty(_newPicketName)
-                && _selectedWarehouses!.First().Pickets.All(p => p.Name.ToUpper() != _newPicketName.ToUpper()))
+                && !string.IsNullOrEmpty(_newName)
+                && _selectedWarehouses!.First().Pickets.All(p => p.Name.ToUpper() != _newName.ToUpper()))
             {
                 if (result)
                 {
                     var newPicket = await HttpService.CreatePicketAsync(new PicketResponse
                         {
-                            Name = _newPicketName,
+                            Name = _newName,
                             WarehouseId = _selectedWarehouses.First().Id
                         });
 
@@ -370,13 +377,13 @@
 
             if (result)
             {
-                if (_deleteTime < selectedArea.CreateTime)
+                if (_tempTime < selectedArea.CreateTime)
                 {
                     SendNotificationMessage(DeleteAreaTitle, "Время удаления площадки должно быть позже ее создания");
                     return;
                 }
 
-                selectedArea.DeleteTime = _deleteTime!.Value;
+                selectedArea.DeleteTime = _tempTime!.Value;
 
                 await HttpService.DeleteAreaAsync(selectedArea);
 
@@ -391,9 +398,51 @@
         }
     }
 
-    private void OnCreateCargo()
+    private async Task OnCreateCargo()
     {
-        SendNotificationMessage(CreateCargoTitle, "Груз добавлен");
+        if (_selectedAreas == null || !_selectedAreas.Any())
+        {
+            SendNotificationMessage(CreateCargoTitle, "Необходимо выбрать площадку!");
+            return;
+        }
+
+        var selectedArea = _selectedAreas.First();
+
+        try
+        {
+            var result = await ShowNewCargoDialog();
+
+            if (result)
+            {
+                if (_tempTime < selectedArea.CreateTime || !decimal.TryParse(_newName, out var weight))
+                {
+                    SendNotificationMessage(CreateCargoTitle, "Время создания площадки должно быть раньше создания груза");
+                    return;
+                }
+
+                var cargoResponse = new CargoResponse
+                    {
+                        AreaId = selectedArea.Id,
+                        LoadTime = _tempTime!.Value,
+                        Weight = weight.ToString(CultureInfo.InvariantCulture)
+                    };
+
+                if (await HttpService.CreateCargoAsync(cargoResponse))
+                {
+                    SendNotificationMessage(CreateCargoTitle, "Груз добавлен!");
+
+                    await ReloadPagesData();
+                }
+                else
+                {
+                    SendNotificationMessage(CreateCargoTitle, "Не удалось добавить груз!", NotificationSeverity.Error);
+                }
+            }
+        }
+        catch
+        {
+            SendNotificationMessage(CreateCargoTitle, "Не создать груз!");
+        }
     }
 
     private async Task OnDeleteCargo()
@@ -412,13 +461,13 @@
 
             if (result)
             {
-                if (_deleteTime < _selectedCargoes.First().LoadTime)
+                if (_tempTime < _selectedCargoes.First().LoadTime)
                 {
                     SendNotificationMessage(DeleteCargoTitle, "Время удаления площадки должно быть позже ее создания");
                     return;
                 }
 
-                selectedCargo.UnloadTime = _deleteTime!.Value;
+                selectedCargo.UnloadTime = _tempTime!.Value;
 
                 await HttpService.DeleteCargoAsync(selectedCargo);
 
@@ -437,5 +486,5 @@
     {
         NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = title, Detail = message });
     }
-}
 
+}

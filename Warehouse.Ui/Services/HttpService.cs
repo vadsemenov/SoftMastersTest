@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using Warehouse.Ui.Model;
@@ -53,5 +54,12 @@ public class HttpService
     public async Task DeleteCargoAsync(CargoResponse selectedCargo)
     {
         await _client.PutAsJsonAsync("Cargo", selectedCargo);
+    }
+
+    public async Task<bool> CreateCargoAsync(CargoResponse cargoResponse)
+    {
+      using var response =  await _client.PostAsJsonAsync("Cargo", cargoResponse);
+
+      return response.StatusCode == HttpStatusCode.OK;
     }
 }

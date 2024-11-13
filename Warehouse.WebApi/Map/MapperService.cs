@@ -34,13 +34,11 @@ public static class MapperService
         {
             Id = areaDto.Id,
             Name = areaDto.Name,
-            Cargo = areaDto.Cargo.Select(c=>c.ToModel()).ToList(),
+            Cargo = areaDto.Cargoes.Select(c=>c.ToModel()).ToList(),
             CreateTime = areaDto.CreateTime,
             DeleteTime = areaDto.DeleteTime ?? DateTime.MinValue,
             Pickets = areaDto.Pickets.Select(p => p.ToModel()).ToList()
         };
-
-        var sdf = areaDto.Cargo.FirstOrDefault(c => c.UnloadTime == null)?.ToModel();
     }
 
     public static Area ToDto(this AreaResponse area)
@@ -51,7 +49,7 @@ public static class MapperService
             Name = area.Name,
             CreateTime = area.CreateTime,
             DeleteTime = area.DeleteTime,
-            Cargo = new List<Cargo>(),
+            Cargoes = new List<Cargo>(),
             Pickets = area.Pickets.Select(p => p.ToDto()).ToList()
         };
     }
@@ -85,6 +83,20 @@ public static class MapperService
             UnloadTime = cargoDto.UnloadTime ?? DateTime.MinValue,
             // UnloadTime = cargoDto.UnloadTime?.ToShortDateString() ?? string.Empty,
             Weight = cargoDto.Weight.ToString(CultureInfo.InvariantCulture)
+        };
+    }
+    public static Cargo ToDto(this CargoResponse cargoResponse)
+    {
+        decimal weight = 0.0M;
+        decimal.TryParse(cargoResponse.Weight, out weight);
+
+        return new Cargo
+        {
+            Id = cargoResponse.Id,
+            LoadTime = cargoResponse.LoadTime,
+            // LoadTime = cargoDto.LoadTime.ToShortDateString(),
+            // UnloadTime = cargoDto.UnloadTime?.ToShortDateString() ?? string.Empty,
+            Weight =  weight
         };
     }
 }

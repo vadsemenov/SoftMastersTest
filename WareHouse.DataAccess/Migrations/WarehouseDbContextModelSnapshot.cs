@@ -68,7 +68,7 @@ namespace Warehouse.DataAccess.Migrations
                     b.ToTable("Areas");
                 });
 
-            modelBuilder.Entity("Warehouse.Core.DTO.Cargo", b =>
+            modelBuilder.Entity("Warehouse.Core.DTO.Cargoes", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -143,7 +143,7 @@ namespace Warehouse.DataAccess.Migrations
 
             modelBuilder.Entity("Warehouse.Core.DTO.Area", b =>
                 {
-                    b.HasOne("Warehouse.Core.DTO.Cargo", "Cargo")
+                    b.HasOne("Warehouse.Core.DTO.Cargoes", "Cargoes")
                         .WithMany()
                         .HasForeignKey("CargoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -155,7 +155,7 @@ namespace Warehouse.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Cargo");
+                    b.Navigation("Cargoes");
 
                     b.Navigation("Warehouse");
                 });
