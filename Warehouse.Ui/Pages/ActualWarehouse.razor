@@ -376,6 +376,10 @@
         //Если не один пикет
         if (selectedPickets.Count > 1)
         {
+            selectedPickets = selectedPickets
+                .OrderBy(p => p.Name)
+                .ToList();
+            
             //Если несколько пикетов
             //Проверить, что они идут по порядку
             for (int i = 1; i < selectedPickets.Count; i++)

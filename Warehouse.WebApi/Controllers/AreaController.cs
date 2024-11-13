@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Sockets;
 using Warehouse.Core.DTO;
 using Warehouse.DataAccess.Repositories.Interfaces;
 using Warehouse.DataAccess.UOW;
@@ -48,15 +49,15 @@ public class AreaController : ControllerBase
 
             var pickets = new List<Picket>();
 
-            await Parallel.ForEachAsync(picketsIds, async (i, token) =>
+            foreach (var id in picketsIds)
             {
-                var picket = await picketRepository.GetByIdAsync(i);
-
+                var picket = await picketRepository.GetByIdAsync(id);
+                
                 if (picket != null)
                 {
                     pickets.Add(picket);
                 }
-            });
+            }
 
             area.Pickets = pickets;
             area.DeleteTime = null;
