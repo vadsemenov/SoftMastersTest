@@ -36,7 +36,16 @@ namespace Warehouse.WebApi.Controllers
 
                 warehouses = warehouses.Select(w =>
                 {
-                    w.Areas = w.Areas.Where(a => a.DeleteTime == null).ToList();
+                    w.Areas = w.Areas
+                        .Where(a => a.DeleteTime == null || a.DeleteTime == DateTime.MinValue)
+                        .Select(a =>
+                        {
+                            a.Cargo = a.Cargo.Where(c => c.UnloadTime == null || c.UnloadTime == DateTime.MinValue)
+                                .ToList();
+
+                            return a;
+                        })
+                        .ToList();
 
                     return w;
                 }).ToList();

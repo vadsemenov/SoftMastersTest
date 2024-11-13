@@ -14,7 +14,7 @@ public class AreaResponse
 
     public int WarehouseId { get; set; }
 
-    public CargoResponse Cargo { get; set; } = null!;
+    public ICollection<CargoResponse> Cargo { get; set; } = null!;
 
     public ICollection<PicketResponse> Pickets { get; set; } = null!;
 }

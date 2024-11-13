@@ -130,7 +130,7 @@
         <div class="border border-success py-2">
             <h4>Грузы площадок</h4>
             <RadzenDataGrid @ref="_cargoDataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-                            Data="@_selectedWarehouses?.FirstOrDefault()?.Areas.Select(a => a.Cargo)" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value="@_selectedCargoes">
+                            Data="@_selectedAreas?.FirstOrDefault()?.Cargo" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value="@_selectedCargoes">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(CargoResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
                     <RadzenDataGridColumn Property="@nameof(CargoResponse.Weight)" Title="Вес груза" Frozen="true" Width="160px" />
@@ -170,7 +170,7 @@
     private RadzenDataGrid<AreaResponse>? _areaDataGrid;
     private RadzenDataGrid<CargoResponse>? _cargoDataGrid;
 
-    private DateTime? _areaDeleteTime = DateTime.Now;
+    private DateTime? _deleteTime = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
@@ -188,7 +188,7 @@
     {
         var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
 
-        return area?.Cargo?.Weight ?? "Отсутствует";
+        return area?.Cargo?.FirstOrDefault()?.Weight ?? "Отсутствует";
     }
 
     private async Task ReloadPagesData()
@@ -217,7 +217,7 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
-    );
+        );
 
         return result is true;
     }
@@ -236,20 +236,20 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
-    );
+        );
 
         return result is true;
     }
 
-    private async Task<bool> ShowDeleteAreaDialog()
+    private async Task<bool> ShowDeleteDialog(string title)
     {
-        var result = await DialogService.OpenAsync("Удаление площадки", ds =>
+        var result = await DialogService.OpenAsync(title, ds =>
     @<RadzenStack Gap="1.5rem">
         <RadzenCard>
             <RadzenStack class="py-2" Gap="1rem" AlignItems="AlignItems.Center">
                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
                     <RadzenLabel Text="Выбрать дату и время" Component="DatePickerWithTime" />
-                    <RadzenDatePicker @bind-Value=@_areaDeleteTime ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" DateFormat="MM/dd/yyyy HH:mm:ss" Name="DatePickerWithTime" />
+                    <RadzenDatePicker @bind-Value=@_deleteTime ShowTime="true" ShowSeconds="true" HoursStep="1.5" MinutesStep="5" SecondsStep="10" DateFormat="MM/dd/yyyy HH:mm:ss" Name="DatePickerWithTime" />
                 </RadzenStack>
             </RadzenStack>
         </RadzenCard>
@@ -335,17 +335,17 @@
                 }
                 else
                 {
-                    SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить пикет!", NotificationSeverity.Error);
+                    SendNotificationMessage(AddPicketTitle, "Не удалось добавить пикет!", NotificationSeverity.Error);
                 }
             }
             else
             {
-                SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить пикет! Имя должно быть уникальным!", NotificationSeverity.Error);
+                SendNotificationMessage(AddPicketTitle, "Не удалось добавить пикет! Имя должно быть уникальным!", NotificationSeverity.Error);
             }
         }
         catch
         {
-            SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить пикет!", NotificationSeverity.Error);
+            SendNotificationMessage(AddPicketTitle, "Не удалось добавить пикет!", NotificationSeverity.Error);
         }
     }
 
@@ -366,23 +366,23 @@
 
         try
         {
-            var result = await ShowDeleteAreaDialog();
+            var result = await ShowDeleteDialog("Удаление площадки");
 
             if (result)
             {
-                if (_areaDeleteTime < selectedArea.CreateTime)
+                if (_deleteTime < selectedArea.CreateTime)
                 {
                     SendNotificationMessage(DeleteAreaTitle, "Время удаления площадки должно быть позже ее создания");
                     return;
                 }
 
-                selectedArea.DeleteTime = _areaDeleteTime!.Value;
+                selectedArea.DeleteTime = _deleteTime!.Value;
 
                 await HttpService.DeleteAreaAsync(selectedArea);
 
                 await ReloadPagesData();
 
-                SendNotificationMessage(AddPicketTitle, "Площадка и груз удалены!");
+                SendNotificationMessage(DeleteAreaTitle, "Площадка и груз удалены!");
             }
         }
         catch
@@ -396,15 +396,46 @@
         SendNotificationMessage(CreateCargoTitle, "Груз добавлен");
     }
 
-    private void OnDeleteCargo()
+    private async Task OnDeleteCargo()
     {
-        SendNotificationMessage(DeleteCargoTitle, "Груз удален");
+        if (_selectedCargoes == null || !_selectedCargoes.Any())
+        {
+            SendNotificationMessage(DeleteCargoTitle, "Необходимо выбрать груз!");
+            return;
+        }
+
+        var selectedCargo = _selectedCargoes.First();
+
+        try
+        {
+            var result = await ShowDeleteDialog("Удаление груза");
+
+            if (result)
+            {
+                if (_deleteTime < _selectedCargoes.First().LoadTime)
+                {
+                    SendNotificationMessage(DeleteCargoTitle, "Время удаления площадки должно быть позже ее создания");
+                    return;
+                }
+
+                selectedCargo.UnloadTime = _deleteTime!.Value;
+
+                await HttpService.DeleteCargoAsync(selectedCargo);
+
+                await ReloadPagesData();
+
+                SendNotificationMessage(DeleteCargoTitle, "Груз удален");
+            }
+        }
+        catch
+        {
+            SendNotificationMessage(DeleteCargoTitle, "Не удалось удалить площадку!");
+        }
     }
 
     private void SendNotificationMessage(string title, string message, NotificationSeverity severity = NotificationSeverity.Info)
     {
         NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = title, Detail = message });
     }
-
 }
 

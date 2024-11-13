@@ -99,7 +99,7 @@
     {
         var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
 
-        return area?.Cargo?.Weight ?? "Отсутствует";
+        return area?.Cargo?.FirstOrDefault()?.Weight ?? "Отсутствует";
     }
 
     private async Task GetWarehousesByTime()

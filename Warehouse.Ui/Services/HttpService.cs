@@ -49,4 +49,9 @@ public class HttpService
     {
         await _client.PutAsJsonAsync("Area", selectedArea);
     }
+
+    public async Task DeleteCargoAsync(CargoResponse selectedCargo)
+    {
+        await _client.PutAsJsonAsync("Cargo", selectedCargo);
+    }
 }

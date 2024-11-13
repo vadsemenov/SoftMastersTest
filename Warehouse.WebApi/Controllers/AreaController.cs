@@ -39,16 +39,21 @@ public class AreaController : ControllerBase
             areaRepository.Update(area);
             await areaRepository.SaveAsync();
 
-            var cargo = await cargoRepository.GetByIdAsync(areaResponse.Cargo.Id);
+            var cargoId = areaResponse.Cargo.FirstOrDefault()?.Id;
 
-            if (cargo == null)
+            if (cargoId != null)
             {
-                NotFound();
-            }
+                var cargo = await cargoRepository.GetByIdAsync(cargoId.Value);
 
-            cargo!.UnloadTime = areaResponse.DeleteTime;
-            cargoRepository.Update(cargo);
-            await cargoRepository.SaveAsync();
+                if (cargo == null)
+                {
+                    NotFound();
+                }
+
+                cargo!.UnloadTime = areaResponse.DeleteTime;
+                cargoRepository.Update(cargo);
+                await cargoRepository.SaveAsync();
+            }
         }
         catch (Exception e)
         {

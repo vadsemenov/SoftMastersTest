@@ -34,11 +34,13 @@ public static class MapperService
         {
             Id = areaDto.Id,
             Name = areaDto.Name,
-            Cargo = areaDto.Cargo.FirstOrDefault(c=>c.UnloadTime == null)?.ToModel(),
+            Cargo = areaDto.Cargo.Select(c=>c.ToModel()).ToList(),
             CreateTime = areaDto.CreateTime,
             DeleteTime = areaDto.DeleteTime ?? DateTime.MinValue,
             Pickets = areaDto.Pickets.Select(p => p.ToModel()).ToList()
         };
+
+        var sdf = areaDto.Cargo.FirstOrDefault(c => c.UnloadTime == null)?.ToModel();
     }
 
     public static Area ToDto(this AreaResponse area)
