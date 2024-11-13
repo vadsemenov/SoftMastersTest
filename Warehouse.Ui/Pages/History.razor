@@ -1,6 +1,5 @@
 ﻿@page "/history"
-@using Warehouse.Ui.Services
-@using Warehouse.Model.Model
+@inject ModelEntityService ModelEntityService
 @inject HttpService HttpService
 @inject NotificationService NotificationService
 
@@ -64,9 +63,9 @@
                                 {
                                     <tr>
                                         <td>@warehouse.Name</td>
-                                        <td>@GetAreaNameByPicket(warehouse, picket)</td>
+                                        <td>@ModelEntityService.GetAreaNameByPicket(warehouse, picket)</td>
                                         <td>@picket.Name</td>
-                                        <td>@GetAreaCargoByPicket(warehouse, picket)</td>
+                                        <td>@ModelEntityService.GetAreaCargoByPicket(warehouse, picket)</td>
                                     </tr>
                                 }
                             }
@@ -88,20 +87,6 @@
         await GetWarehousesByTime();
     }
 
-    private string GetAreaNameByPicket(WarehouseResponse warehouse, PicketResponse picket)
-    {
-        var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
-
-        return area?.Name ?? "Отсутствует";
-    }
-
-    private string GetAreaCargoByPicket(WarehouseResponse warehouse, PicketResponse picket)
-    {
-        var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
-
-        return area?.Cargo?.FirstOrDefault()?.Weight ?? "Отсутствует";
-    }
-
     private async Task GetWarehousesByTime()
     {
         try
@@ -110,14 +95,9 @@
         }
         catch
         {
-            SendNotificationMessage("Получение истории", "Не удалось обновить историю!", NotificationSeverity.Error);
+            ModelEntityService.SendNotificationMessage("Получение истории", "Не удалось обновить историю!", NotificationSeverity.Error);
         }
 
-        SendNotificationMessage("Получение истории", "История обновлена");
-    }
-
-    private void SendNotificationMessage(string title, string message, NotificationSeverity severity = NotificationSeverity.Info)
-    {
-        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = title, Detail = message });
+        ModelEntityService.SendNotificationMessage("Получение истории", "История обновлена");
     }
 }

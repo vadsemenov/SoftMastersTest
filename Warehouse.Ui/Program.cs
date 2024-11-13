@@ -14,6 +14,8 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(webApiUr
 
 builder.Services.AddScoped<HttpService>();
 
+builder.Services.AddScoped<ModelEntityService>();
+
 builder.Services.AddRadzenComponents();
 
 await builder.Build().RunAsync();

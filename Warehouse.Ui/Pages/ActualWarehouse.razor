@@ -1,11 +1,7 @@
 ﻿@page "/"
-@using Warehouse.Ui.Services
-@using System.Globalization
-@using Warehouse.Model.Model
 @inject HttpService HttpService
-@inject NotificationService NotificationService
+@inject ModelEntityService ModelEntityService
 @inject DialogService DialogService
-@inject NavigationManager NavigationManager
 
 <div align="center" class="container pb-5">
     <div class="row">
@@ -61,9 +57,9 @@
                                 {
                                     <tr>
                                         <td>@warehouse.Name</td>
-                                        <td>@GetAreaNameByPicket(warehouse, picket)</td>
+                                        <td>@ModelEntityService.GetAreaNameByPicket(warehouse, picket)</td>
                                         <td>@picket.Name</td>
-                                        <td>@GetAreaCargoByPicket(warehouse, picket)</td>
+                                        <td>@ModelEntityService.GetAreaCargoByPicket(warehouse, picket)</td>
                                     </tr>
                                 }
                             }
@@ -76,7 +72,7 @@
         @* Список складов *@
         <div class="border border-success py-2">
             <h4>Склады</h4>
-            <RadzenDataGrid @ref="_warehouseDataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                             Data="@_warehouses" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value="@_selectedWarehouses">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(WarehouseResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
@@ -86,7 +82,6 @@
             <RadzenStack class="py-2" Gap="1rem" AlignItems="AlignItems.Center">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
                     <RadzenButton Shade="Shade.Light" Click="@(args => OnAddWarehouse())" Text="Добавить склад" ButtonStyle="ButtonStyle.Success" />
-                    @* <RadzenButton Shade="Shade.Light" Click=@(args => OnDeleteWarehouse()) Text="Удалить склад" ButtonStyle="ButtonStyle.Danger" /> *@
                 </RadzenStack>
             </RadzenStack>
         </div>
@@ -94,7 +89,7 @@
         @* Список пикетов *@
         <div class="border border-success py-2">
             <h4 class="pt-2">Пикеты выбранного склада</h4>
-            <RadzenDataGrid @ref="_picketDataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                             Data="@_selectedWarehouses?.FirstOrDefault()?.Pickets" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Multiple" @bind-Value="@_selectedPickets">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(PicketResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
@@ -104,7 +99,6 @@
             <RadzenStack class="py-2" Gap="1rem" AlignItems="AlignItems.Center">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
                     <RadzenButton Shade="Shade.Light" Click=@(args => OnAddPicket()) Text="Добавить пикет" ButtonStyle="ButtonStyle.Success" />
-                    @* <RadzenButton Shade="Shade.Light" Click=@(args => OnDeleteWarehouse()) Text="Delete Picket" ButtonStyle="ButtonStyle.Danger" /> *@
                 </RadzenStack>
             </RadzenStack>
         </div>
@@ -112,7 +106,7 @@
         @* Список площадок *@
         <div class="border border-success py-2">
             <h4>Площадки выбранного склада</h4>
-            <RadzenDataGrid @ref="_areaDataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                             Data="@_selectedWarehouses?.FirstOrDefault()?.Areas" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value="@_selectedAreas">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(AreaResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
@@ -132,7 +126,7 @@
         @* Список грузов *@
         <div class="border border-success py-2">
             <h4>Грузы площадок</h4>
-            <RadzenDataGrid @ref="_cargoDataGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                             Data="@_selectedAreas?.FirstOrDefault()?.Cargo" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value="@_selectedCargoes">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(CargoResponse.Id)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
@@ -167,30 +161,12 @@
     private const string DeleteCargoTitle = "Удаление груза";
 
     private string _newName = string.Empty;
-    private RadzenDataGrid<WarehouseResponse>? _warehouseDataGrid;
-    private RadzenDataGrid<PicketResponse>? _picketDataGrid;
-    private RadzenDataGrid<AreaResponse>? _areaDataGrid;
-    private RadzenDataGrid<CargoResponse>? _cargoDataGrid;
 
     private DateTime? _tempTime = DateTime.Now;
 
     protected override async Task OnInitializedAsync()
     {
         _warehouses = await HttpService.GetWarehousesAsync();
-    }
-
-    private string GetAreaNameByPicket(WarehouseResponse warehouse, PicketResponse picket)
-    {
-        var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
-
-        return area?.Name ?? "Отсутствует";
-    }
-
-    private string GetAreaCargoByPicket(WarehouseResponse warehouse, PicketResponse picket)
-    {
-        var area = warehouse.Areas.FirstOrDefault(a => a.Pickets.Any(p => p.Id == picket.Id));
-
-        return area?.Cargo?.FirstOrDefault()?.Weight ?? "Отсутствует";
     }
 
     private async Task ReloadPagesData()
@@ -200,9 +176,6 @@
         _selectedPickets = null;
         _selectedAreas = null;
         _selectedCargoes = null;
-
-        // await _picketDataGrid.Reload();
-        // NavigationManager.NavigateTo(NavigationManager.Uri);
     }
 
     private async Task<bool> ShowNewDialog(string title)
@@ -293,18 +266,18 @@
                     {
                         await ReloadPagesData();
 
-                        SendNotificationMessage(AddWarehouseTitle, "Склад добавлен");
+                        ModelEntityService.SendNotificationMessage(AddWarehouseTitle, "Склад добавлен");
                     }
                 }
                 else
                 {
-                    SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить склад! Имя не должно быть пустым!", NotificationSeverity.Error);
+                    ModelEntityService.SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить склад! Имя не должно быть пустым!", NotificationSeverity.Error);
                 }
             }
         }
         catch
         {
-            SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить склад!", NotificationSeverity.Error);
+            ModelEntityService.SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить склад!", NotificationSeverity.Error);
         }
     }
 
@@ -315,7 +288,7 @@
             if (_selectedWarehouses == null
                 || !_selectedWarehouses!.Any())
             {
-                SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить пикет! Должен быть выбран склад!", NotificationSeverity.Error);
+                ModelEntityService.SendNotificationMessage(AddWarehouseTitle, "Не удалось добавить пикет! Должен быть выбран склад!", NotificationSeverity.Error);
                 return;
             }
 
@@ -336,17 +309,17 @@
                 {
                     await ReloadPagesData();
 
-                    SendNotificationMessage(AddPicketTitle, "Пикет добавлен");
+                    ModelEntityService.SendNotificationMessage(AddPicketTitle, "Пикет добавлен");
                 }
             }
             else
             {
-                SendNotificationMessage(AddPicketTitle, "Не удалось добавить пикет! Имя должно быть уникальным!", NotificationSeverity.Error);
+                ModelEntityService.SendNotificationMessage(AddPicketTitle, "Не удалось добавить пикет! Имя должно быть уникальным!", NotificationSeverity.Error);
             }
         }
         catch
         {
-            SendNotificationMessage(AddPicketTitle, "Не удалось добавить пикет!", NotificationSeverity.Error);
+            ModelEntityService.SendNotificationMessage(AddPicketTitle, "Не удалось добавить пикет!", NotificationSeverity.Error);
         }
     }
 
@@ -356,7 +329,7 @@
 
         if (selectedPickets == null || !selectedPickets.Any())
         {
-            SendNotificationMessage(AddAreaTitle, "Необходимо выбрать пикеты!");
+            ModelEntityService.SendNotificationMessage(AddAreaTitle, "Необходимо выбрать пикеты!");
             return;
         }
 
@@ -364,12 +337,12 @@
         var areas = _selectedWarehouses?.First().Areas;
 
         var busyPickets = selectedPickets
-            .Where(p => areas.SelectMany(a => a.Pickets).Any(pic => pic.Id == p.Id))
+            .Where(p => areas!.SelectMany(a => a.Pickets).Any(pic => pic.Id == p.Id))
             .ToList();
 
         if (busyPickets.Any())
         {
-            SendNotificationMessage(AddAreaTitle, "Выбранные пикеты заняты!", NotificationSeverity.Error);
+            ModelEntityService.SendNotificationMessage(AddAreaTitle, "Выбранные пикеты заняты!", NotificationSeverity.Error);
             return;
         }
 
@@ -386,7 +359,7 @@
             {
                 if (selectedPickets[i].Name != selectedPickets[i - 1].Name + 1)
                 {
-                    SendNotificationMessage(AddAreaTitle, "Выбранные пикеты должны идти по порядку!", NotificationSeverity.Error);
+                    ModelEntityService.SendNotificationMessage(AddAreaTitle, "Выбранные пикеты должны идти по порядку!", NotificationSeverity.Error);
                     return;
                 }
             }
@@ -403,13 +376,13 @@
 
         if (await HttpService.CreateAreaAsync(areaResponse))
         {
-            SendNotificationMessage(AddAreaTitle, "Площадка добавлена!");
+            ModelEntityService.SendNotificationMessage(AddAreaTitle, "Площадка добавлена!");
 
             await ReloadPagesData();
         }
         else
         {
-            SendNotificationMessage(AddAreaTitle, "Не удалось добавить площадку!", NotificationSeverity.Error);
+            ModelEntityService.SendNotificationMessage(AddAreaTitle, "Не удалось добавить площадку!", NotificationSeverity.Error);
         }
     }
 
@@ -417,7 +390,7 @@
     {
         if (_selectedAreas == null || !_selectedAreas.Any())
         {
-            SendNotificationMessage(DeleteAreaTitle, "Необходимо выбрать площадку!");
+            ModelEntityService.SendNotificationMessage(DeleteAreaTitle, "Необходимо выбрать площадку!");
             return;
         }
 
@@ -431,7 +404,7 @@
             {
                 if (_tempTime < selectedArea.CreateTime)
                 {
-                    SendNotificationMessage(DeleteAreaTitle, "Время удаления площадки должно быть позже ее создания");
+                    ModelEntityService.SendNotificationMessage(DeleteAreaTitle, "Время удаления площадки должно быть позже ее создания");
                     return;
                 }
 
@@ -441,12 +414,12 @@
 
                 await ReloadPagesData();
 
-                SendNotificationMessage(DeleteAreaTitle, "Площадка и груз удалены!");
+                ModelEntityService.SendNotificationMessage(DeleteAreaTitle, "Площадка и груз удалены!");
             }
         }
         catch
         {
-            SendNotificationMessage(DeleteAreaTitle, "Не удалось удалить площадку!");
+            ModelEntityService.SendNotificationMessage(DeleteAreaTitle, "Не удалось удалить площадку!");
         }
     }
 
@@ -454,10 +427,10 @@
     {
         if (_selectedAreas == null || !_selectedAreas.Any())
         {
-            SendNotificationMessage(CreateCargoTitle, "Необходимо выбрать площадку!");
+            ModelEntityService.SendNotificationMessage(CreateCargoTitle, "Необходимо выбрать площадку!");
             return;
         }
-
+        _tempTime = DateTime.Now;
         var selectedArea = _selectedAreas.First();
 
         try
@@ -468,9 +441,9 @@
             {
                 var weightIsDecimal = decimal.TryParse(_newName, out var weight);
 
-                if (_tempTime > selectedArea.CreateTime || !weightIsDecimal )
+                if (_tempTime < selectedArea.CreateTime || !weightIsDecimal )
                 {
-                    SendNotificationMessage(CreateCargoTitle, "Время создания площадки должно быть раньше создания груза");
+                    ModelEntityService.SendNotificationMessage(CreateCargoTitle, "Время создания площадки должно быть раньше создания груза");
                     return;
                 }
 
@@ -483,19 +456,19 @@
 
                 if (await HttpService.CreateCargoAsync(cargoResponse))
                 {
-                    SendNotificationMessage(CreateCargoTitle, "Груз добавлен!");
+                    ModelEntityService.SendNotificationMessage(CreateCargoTitle, "Груз добавлен!");
 
                     await ReloadPagesData();
                 }
                 else
                 {
-                    SendNotificationMessage(CreateCargoTitle, "Не удалось добавить груз!", NotificationSeverity.Error);
+                    ModelEntityService.SendNotificationMessage(CreateCargoTitle, "Не удалось добавить груз!", NotificationSeverity.Error);
                 }
             }
         }
         catch
         {
-            SendNotificationMessage(CreateCargoTitle, "Не создать груз!");
+            ModelEntityService.SendNotificationMessage(CreateCargoTitle, "Не создать груз!");
         }
     }
 
@@ -503,7 +476,7 @@
     {
         if (_selectedCargoes == null || !_selectedCargoes.Any())
         {
-            SendNotificationMessage(DeleteCargoTitle, "Необходимо выбрать груз!");
+            ModelEntityService.SendNotificationMessage(DeleteCargoTitle, "Необходимо выбрать груз!");
             return;
         }
 
@@ -517,7 +490,7 @@
             {
                 if (_tempTime < _selectedCargoes.First().LoadTime)
                 {
-                    SendNotificationMessage(DeleteCargoTitle, "Время удаления площадки должно быть позже ее создания");
+                    ModelEntityService.SendNotificationMessage(DeleteCargoTitle, "Время удаления площадки должно быть позже ее создания");
                     return;
                 }
 
@@ -527,18 +500,13 @@
 
                 await ReloadPagesData();
 
-                SendNotificationMessage(DeleteCargoTitle, "Груз удален");
+                ModelEntityService.SendNotificationMessage(DeleteCargoTitle, "Груз удален");
             }
         }
         catch
         {
-            SendNotificationMessage(DeleteCargoTitle, "Не удалось удалить площадку!");
+            ModelEntityService.SendNotificationMessage(DeleteCargoTitle, "Не удалось удалить площадку!");
         }
-    }
-
-    private void SendNotificationMessage(string title, string message, NotificationSeverity severity = NotificationSeverity.Info)
-    {
-        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = title, Detail = message });
     }
 
 }
