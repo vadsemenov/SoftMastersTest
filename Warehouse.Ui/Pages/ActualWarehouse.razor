@@ -219,7 +219,7 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
-    );
+        );
 
         return result is true;
     }
@@ -244,7 +244,7 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
-    );
+        );
 
         return result is true;
     }
@@ -350,9 +350,63 @@
         }
     }
 
-    private void OnAddArea()
+    private async Task OnAddArea()
     {
-        SendNotificationMessage(AddAreaTitle, "Площадка добавлена");
+        var selectedPickets = _selectedPickets;
+
+        if (selectedPickets == null || !selectedPickets.Any())
+        {
+            SendNotificationMessage(AddAreaTitle, "Необходимо выбрать пикеты!");
+            return;
+        }
+
+        //Проверить что пикеты не заняты не одной площадкой
+        var areas = _selectedWarehouses?.First().Areas;
+
+        var busyPickets = selectedPickets
+            .Where(p => areas.SelectMany(a => a.Pickets).Any(pic => pic.Id == p.Id))
+            .ToList();
+
+        if (busyPickets.Any())
+        {
+            SendNotificationMessage(AddAreaTitle, "Выбранные пикеты заняты!", NotificationSeverity.Error);
+            return;
+        }
+
+        //Если не один пикет
+        if (selectedPickets.Count > 1)
+        {
+            //Если несколько пикетов
+            //Проверить, что они идут по порядку
+            for (int i = 1; i < selectedPickets.Count; i++)
+            {
+                if (selectedPickets[i].Name != selectedPickets[i - 1].Name + 1)
+                {
+                    SendNotificationMessage(AddAreaTitle, "Выбранные пикеты должны идти по порядку!", NotificationSeverity.Error);
+                    return;
+                }
+            }
+        }
+
+        var areaResponse = new AreaResponse
+            {
+                Cargo = new List<CargoResponse>(),
+                Name= string.Empty,
+                Pickets = selectedPickets,
+                CreateTime = DateTime.Now,
+                WarehouseId = _selectedWarehouses?.First().Id ?? -1
+            };
+
+        if (await HttpService.CreateAreaAsync(areaResponse))
+        {
+            SendNotificationMessage(AddAreaTitle, "Площадка добавлена!");
+
+            await ReloadPagesData();
+        }
+        else
+        {
+            SendNotificationMessage(AddAreaTitle, "Не удалось добавить площадку!", NotificationSeverity.Error);
+        }
     }
 
     private async Task OnDeleteArea()
@@ -408,7 +462,9 @@
 
             if (result)
             {
-                if (_tempTime < selectedArea.CreateTime || !decimal.TryParse(_newName, out var weight))
+                var weightIsDecimal = decimal.TryParse(_newName, out var weight);
+
+                if (_tempTime > selectedArea.CreateTime || !weightIsDecimal )
                 {
                     SendNotificationMessage(CreateCargoTitle, "Время создания площадки должно быть раньше создания груза");
                     return;

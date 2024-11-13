@@ -62,4 +62,11 @@ public class HttpService
 
       return response.StatusCode == HttpStatusCode.OK;
     }
+
+    public async Task<bool> CreateAreaAsync(AreaResponse areaResponse)
+    {
+        using var response = await _client.PostAsJsonAsync("Area", areaResponse);
+
+        return response.StatusCode == HttpStatusCode.OK;
+    }
 }

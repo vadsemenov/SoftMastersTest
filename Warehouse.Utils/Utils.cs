@@ -4,11 +4,11 @@ namespace Warehouse.Utils;
 
 public static class Utils
 {
-    public static string GetAreaName(this List<Picket> pickets)
+    public static string GetAreaName(this ICollection<Picket> pickets)
     {
         if (pickets.Count == 1)
         {
-            return pickets[0].Name.ToString();
+            return pickets.First().Name.ToString();
         }
 
         return pickets.First().Name + "-" + pickets.Last().Name;

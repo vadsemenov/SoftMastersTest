@@ -67,7 +67,7 @@ public static class MapperService
     {
         return new Picket
         {
-            // Id = picket.Id,
+            Id = picket.Id,
             Name = picket.Name,
             Areas = new List<Area>()
         };
